@@ -28,17 +28,14 @@
       let controller;
       const loader = new GLTFLoader();
       let reticle;
+      let hitTestSource = null;
+      let hitTestSourceRequested = false;
 
       const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
       light.position.set(0.5, 1, 0.25);
       scene.add(light);
 
-      const hitTestSourceRequested = false;
-      let hitTestSource = null;
-
-      const modelURL = './pinkcube.glb'; // Blenderで書き出したモデル
-
-      const clock = new THREE.Clock();
+      const modelURL = location.origin + '/pinkcube.glb'; // GitHub Pages対応
 
       function onSelect() {
         if (reticle.visible) {
@@ -71,6 +68,7 @@
             session.requestReferenceSpace('viewer').then((refSpace) => {
               session.requestHitTestSource({ space: refSpace }).then((source) => {
                 hitTestSource = source;
+                hitTestSourceRequested = true;
               });
             });
           }
