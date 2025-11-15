@@ -1,17 +1,9 @@
 import * as THREE from './js/three.module.js';
 import { DeviceOrientationControls } from "three/examples/jsm/controls/DeviceOrientationControls";
-let w;
-let h;
-let canvas;
-let scene;
-let camera;
-let renderer;
-let object;
-let controls;
 
+let w, h, canvas, scene, camera, renderer, object, controls;
 let deviceOrienModal = null;
 let deviceOrienModalButton = null;
-
 let video = null;
 let videoInput = null;
 let videoStream = null;
@@ -26,7 +18,7 @@ const initVideo = () => {
       videoInput = devices.filter((device) => device.kind === "videoinput");
       getVideo();
     })
-    .catch(function (error) {
+    .catch((error) => {
       console.log(error);
     });
 };
@@ -35,7 +27,7 @@ const setVideo = () => {
   return {
     audio: false,
     video: {
-      deviceId: videoInput,
+      deviceId: videoInput.length > 0 ? { exact: videoInput[0].deviceId } : undefined,
       facingMode: "environment",
       width: { min: 1280, max: 1920 },
       height: { min: 720, max: 1080 },
@@ -49,12 +41,12 @@ const getVideo = () => {
   }
   navigator.mediaDevices
     .getUserMedia(setVideo())
-    .then(function (stream) {
+    .then((stream) => {
       video.srcObject = stream;
       video.play();
       videoStream = stream;
     })
-    .catch(function (error) {
+    .catch((error) => {
       console.log(error);
       alert(
         "カメラの使用が拒否されています。\nページを再読み込みして使用を許可するか、ブラウザの設定をご確認ください。"
@@ -68,17 +60,17 @@ const adjustVideo = () => {
   const videoWidth = video.videoWidth;
   const videoHeight = video.videoHeight;
 
-  let videoAspect: number = videoWidth / videoHeight;
-  let windowAspect: number = windowWidth / windowHeight;
+  const videoAspect = videoWidth / videoHeight;
+  const windowAspect = windowWidth / windowHeight;
 
   if (windowAspect < videoAspect) {
-    let newWidth: number = videoAspect * windowHeight;
+    const newWidth = videoAspect * windowHeight;
     video.style.width = newWidth + "px";
     video.style.marginLeft = -(newWidth - windowWidth) / 2 + "px";
     video.style.height = windowHeight + "px";
     video.style.marginTop = "0px";
   } else {
-    let newHeight: number = 1 / (videoAspect / windowWidth);
+    const newHeight = windowWidth / videoAspect;
     video.style.height = newHeight + "px";
     video.style.marginTop = -(newHeight - windowHeight) / 2 + "px";
     video.style.width = windowWidth + "px";
@@ -88,16 +80,12 @@ const adjustVideo = () => {
 
 const isIos = () => {
   const ua = navigator.userAgent.toLowerCase();
-  return (
-    ua.indexOf("iphone") >= 0 ||
-    ua.indexOf("ipad") >= 0 ||
-    ua.indexOf("ipod") >= 0
-  );
+  return ua.includes("iphone") || ua.includes("ipad") || ua.includes("ipod");
 };
 
 const checkDeviceOrien = () => {
   return new Promise((resolve, reject) => {
-    if (!isIos()) resolve("resolve");
+    if (!isIos()) return resolve("resolve");
 
     const deviceOrienEvent = () => {
       hideDeviceOrienModal();
@@ -107,9 +95,7 @@ const checkDeviceOrien = () => {
     window.addEventListener("deviceorientation", deviceOrienEvent, false);
 
     deviceOrienModal = document.getElementById("device-orien-modal");
-    deviceOrienModalButton = document.getElementById(
-      "device-orien-modal-button"
-    );
+    deviceOrienModalButton = document.getElementById("device-orien-modal-button");
     const alertMessage =
       "モーションセンサーの使用が拒否されました。\nこのページを楽しむには、デバイスモーションセンサーの使用を許可する必要があります。\nSafariのアプリを再起動して、モーションセンサーの使用（「動作と方向」へのアクセス）を許可をしてください。";
     deviceOrienModal.classList.remove("is-hidden");
@@ -117,17 +103,17 @@ const checkDeviceOrien = () => {
     deviceOrienModalButton.addEventListener("click", () => {
       if (
         DeviceMotionEvent &&
-        (DeviceMotionEvent as any).requestPermission &&
-        typeof (DeviceMotionEvent as any).requestPermission === "function"
+        DeviceMotionEvent.requestPermission &&
+        typeof DeviceMotionEvent.requestPermission === "function"
       ) {
-        (DeviceMotionEvent as any).requestPermission().then((res: any) => {});
+        DeviceMotionEvent.requestPermission().then(() => {});
       }
       if (
         DeviceOrientationEvent &&
-        (DeviceOrientationEvent as any).requestPermission &&
-        typeof (DeviceOrientationEvent as any).requestPermission === "function"
+        DeviceOrientationEvent.requestPermission &&
+        typeof DeviceOrientationEvent.requestPermission === "function"
       ) {
-        (DeviceOrientationEvent as any).requestPermission().then((res: any) => {
+        DeviceOrientationEvent.requestPermission().then((res) => {
           console.log(res);
           if (res === "granted") {
             hideDeviceOrienModal();
