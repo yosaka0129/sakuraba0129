@@ -294,12 +294,12 @@ class ShapeExplosion {
         this.positions[i*3+1] = 0;
         this.positions[i*3+2] = 0;
 
-        // 広がり後は花火の1/2サイズ
-        this.velocities.push(new THREE.Vector3(rx * 0.025, ry * 0.025, vz));
+        // 広がり後は花火の1/3サイズ
+        this.velocities.push(new THREE.Vector3(rx * 0.017, ry * 0.017, vz));
       } else if (type === "sakura") {
         const spikes = 5;
         const baseAngle = Math.floor(Math.random() * spikes) * (2 * Math.PI / spikes);
-        const radius = 0.25 + Math.random() * 0.1; // 花びらを大きく
+        const radius = 0.25 + Math.random() * 0.1; // 花びらを大きめに
         x = Math.cos(baseAngle) * radius;
         y = Math.sin(baseAngle) * radius;
 
@@ -312,8 +312,8 @@ class ShapeExplosion {
         this.positions[i*3+1] = 0;
         this.positions[i*3+2] = 0;
 
-        // 広がり後は花火の1/3サイズ
-        this.velocities.push(new THREE.Vector3(rx * 0.33, ry * 0.33, vz));
+        // 広がり後は花火の1/4サイズ
+        this.velocities.push(new THREE.Vector3(rx * 0.012, ry * 0.012, vz));
       }
     }
 
@@ -343,7 +343,7 @@ class ShapeExplosion {
 
     this.material = new THREE.PointsMaterial({
       map: glowTexture,
-      size: type === "sakura" ? 0.22 : 0.18, // 桜はさらに大きめ
+      size: type === "sakura" ? 0.22 : 0.18, // 桜は少し大きめ
       transparent: true,
       opacity: 1,
       blending: THREE.AdditiveBlending,
