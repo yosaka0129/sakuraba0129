@@ -4,8 +4,8 @@ import * as THREE from 'https://unpkg.com/three@0.181.0/build/three.module.js';
 // Web Audio
 // ===========================
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-let fireworkBuffer2 = null;
-let fireworkBuffer = null;
+let fireworkBuffer2 = null; // 上昇〜爆発直前など
+let fireworkBuffer = null;  // 爆発音（セカンドにも利用）
 let audioEnabled = false;
 
 fetch('./sounds/firework2.mp3')
@@ -76,6 +76,13 @@ window.addEventListener('resize', () => {
 // Textures
 // ===========================
 const glowTexture = new THREE.TextureLoader().load('./textures/glow.png');
+
+// ===========================
+// Shared arrays and limits
+// ===========================
+const fireworks = [];         // FireworkBall と Explosion/ShapeExplosion を混在で管理
+const MAX_FIREWORKS = 24;     // 同時上限（メイン打ち上げ）
+const MAX_BACKGROUND = 18;    // 背景演出の同時上限（控えめ）
 
 // ===========================
 // FireworkBall class
@@ -162,7 +169,7 @@ class FireworkBall {
 }
 
 // ===========================
-// Explosion class
+// Explosion class (球状＋二段爆発)
 // ===========================
 class Explosion {
   constructor(position, isSecond = false) {
@@ -251,11 +258,108 @@ class Explosion {
 }
 
 // ===========================
-// Launch management
+// ShapeExplosion class (ハート・桜花火、ピンク限定)
 // ===========================
-const fireworks = [];
-const MAX_FIREWORKS = 24;
+class ShapeExplosion {
+  constructor(position, type = "heart") {
+    const count = 500;
+    this.positions = new Float32Array(count * 3);
+    this.velocities = [];
+    this.gravity = new THREE.Vector3(0, -0.0015, 0);
 
+    for (let i = 0; i < count; i++) {
+      let vx, vy, vz;
+
+      if (type === "heart") {
+        // ハート型の座標式
+        const t = Math.random() * Math.PI;
+        const x = 16 * Math.pow(Math.sin(t), 3);
+        const y = 13 * Math.cos(t) - 5 * Math.cos(2*t)
+                - 2 * Math.cos(3*t) - Math.cos(4*t);
+        const scale = 0.01;
+        vx = x * scale;
+        vy = y * scale;
+        vz = (Math.random() - 0.5) * 0.02;
+      } else if (type === "sakura") {
+        // 桜型（五角形の花びら風）
+        const spikes = 5;
+        const angle = Math.floor(Math.random() * spikes) * (2 * Math.PI / spikes);
+        const radius = 0.08 + Math.random() * 0.04;
+        vx = Math.cos(angle) * radius * (0.8 + Math.random() * 0.4);
+        vy = Math.sin(angle) * radius * (0.8 + Math.random() * 0.4);
+        vx += (Math.random() - 0.5) * 0.02;
+        vy += (Math.random() - 0.5) * 0.02;
+        vz = (Math.random() - 0.5) * 0.02;
+      }
+
+      this.positions[i*3+0] = 0;
+      this.positions[i*3+1] = 0;
+      this.positions[i*3+2] = 0;
+      this.velocities.push(new THREE.Vector3(vx, vy, vz));
+    }
+
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+
+    // ピンク限定カラー
+    this.colors = [];
+    for (let i = 0; i < count; i++) {
+      const color = new THREE.Color().setHSL(
+        0.95 + Math.random()*0.03, // ピンク系
+        0.6 + Math.random()*0.3,
+        0.6 + Math.random()*0.3
+      );
+      this.colors.push(color.r, color.g, color.b);
+    }
+    this.geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.colors, 3));
+
+    this.material = new THREE.PointsMaterial({
+      map: glowTexture,
+      size: 0.085,
+      transparent: true,
+      opacity: 1,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true,
+      vertexColors: true
+    });
+
+    this.points = new THREE.Points(this.geometry, this.material);
+    this.points.position.copy(position);
+    scene.add(this.points);
+
+    this.age = 0;
+    this.lifespan = 80;
+  }
+
+  update() {
+    this.age++;
+    for (let i = 0; i < this.velocities.length; i++) {
+      const v = this.velocities[i];
+      v.multiplyScalar(0.985);
+      v.add(this.gravity);
+      this.positions[i*3+0] += v.x;
+      this.positions[i*3+1] += v.y;
+      this.positions[i*3+2] += v.z;
+    }
+    this.geometry.attributes.position.needsUpdate = true;
+
+    const t = this.age / this.lifespan;
+    this.material.opacity = Math.pow(1 - t, 2);
+  }
+
+  isDead() { return this.age > this.lifespan; }
+
+  dispose() {
+    scene.remove(this.points);
+    this.geometry.dispose();
+    this.material.dispose();
+  }
+}
+
+// ===========================
+// Launch management (メイン花火)
+// ===========================
 function launchFireworkSet() {
   const numBalls = 2 + Math.floor(Math.random() * 4); // 2〜4個
   for (let i = 0; i < numBalls; i++) {
@@ -267,12 +371,29 @@ function launchFireworkSet() {
   }
 }
 
-// 花火を定期的に打ち上げる
+// 花火を定期的に打ち上げる（メイン）
 setInterval(() => {
   if (fireworks.length < MAX_FIREWORKS) {
     launchFireworkSet();
   }
 }, 1500); // 少し遅めの間隔
+
+// ===========================
+// Background演出 (ハート・桜花火)
+// ===========================
+setInterval(() => {
+  if (Math.random() < 0.4) { // 40%の確率
+    const numSpecial = Math.floor(Math.random() * 3) + 2; // 2〜4個
+    for (let i = 0; i < numSpecial; i++) {
+      const type = Math.random() < 0.5 ? "heart" : "sakura";
+      fireworks.push(new ShapeExplosion(new THREE.Vector3(
+        (Math.random() - 0.5) * 6,   // 横方向
+        -1 + Math.random() * 3,      // 縦方向
+        -10 + Math.random() * 4      // 奥行き（背景に配置）
+      ), type));
+    }
+  }
+}, 2000); // 2秒ごとに判定
 
 // ===========================
 // Render loop
@@ -283,9 +404,7 @@ function animate() {
   for (let i = fireworks.length - 1; i >= 0; i--) {
     fireworks[i].update();
     if (fireworks[i].isDead()) {
-      if (fireworks[i] instanceof Explosion) {
-        fireworks[i].dispose();
-      }
+      fireworks[i].dispose?.();
       fireworks.splice(i, 1);
     }
   }
