@@ -247,9 +247,9 @@ function launchFireworkSet() {
   const numBalls = 2 + Math.floor(Math.random() * 3); // 2〜4個
   for (let i = 0; i < numBalls; i++) {
     fireworks.push(new FireworkBall(new THREE.Vector3(
-      (Math.random() - 0.5) * 4,     // X
-      -2 + Math.random() * 0.5,      // Y slight variation
-      -5 + Math.random() * 2         // Z depth variation
+      (Math.random() - 0.5) * 6,     // X: 横方向をもっと広く
+      -2 + Math.random() * 4,        // Y: 下だけでなく上の方からもスタート
+      -6 + Math.random() * 6         // Z: 奥行きもばらつかせる
     )));
   }
 }
