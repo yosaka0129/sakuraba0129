@@ -248,7 +248,7 @@ const fireworks = [];
 const MAX_FIREWORKS = 24;
 
 function launchFireworkSet() {
-  const numBalls = 2 + Math.floor(Math.random() * 3); // 2〜4個
+  const numBalls = 2 + Math.floor(Math.random() * 4); // 2〜4個
   for (let i = 0; i < numBalls; i++) {
     fireworks.push(new FireworkBall(new THREE.Vector3(
       (Math.random() - 0.5) * 6,     // X: 横方向をもっと広く
