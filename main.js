@@ -271,22 +271,20 @@ class ShapeExplosion {
       let vx, vy, vz;
 
       if (type === "heart") {
-        // ハート型の座標式
-        const t = Math.random() * Math.PI;
+        const t = Math.random() * 2 * Math.PI; // ← 修正済み
         const x = 16 * Math.pow(Math.sin(t), 3);
         const y = 13 * Math.cos(t) - 5 * Math.cos(2*t)
                 - 2 * Math.cos(3*t) - Math.cos(4*t);
-        const scale = 0.01;
+        const scale = 0.009; // ← 少し小さめに
         vx = x * scale;
         vy = y * scale;
         vz = (Math.random() - 0.5) * 0.02;
       } else if (type === "sakura") {
-        // 桜型（五角形の花びら風）
         const spikes = 5;
         const angle = Math.floor(Math.random() * spikes) * (2 * Math.PI / spikes);
-        const radius = 0.08 + Math.random() * 0.04;
-        vx = Math.cos(angle) * radius * (0.8 + Math.random() * 0.4);
-        vy = Math.sin(angle) * radius * (0.8 + Math.random() * 0.4);
+        const radius = 0.07 + Math.random() * 0.03; // ← 少し小さめに
+        vx = Math.cos(angle) * radius;
+        vy = Math.sin(angle) * radius;
         vx += (Math.random() - 0.5) * 0.02;
         vy += (Math.random() - 0.5) * 0.02;
         vz = (Math.random() - 0.5) * 0.02;
@@ -301,13 +299,13 @@ class ShapeExplosion {
     this.geometry = new THREE.BufferGeometry();
     this.geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
 
-    // ピンク限定カラー
+    // ピンクを濃ゆく派手に
     this.colors = [];
     for (let i = 0; i < count; i++) {
       const color = new THREE.Color().setHSL(
-        0.95 + Math.random()*0.03, // ピンク系
-        0.6 + Math.random()*0.3,
-        0.6 + Math.random()*0.3
+        0.95 + Math.random()*0.02, // ピンク系
+        0.85 + Math.random()*0.15, // 彩度高め
+        0.5 + Math.random()*0.1    // 明度低めで濃ゆく
       );
       this.colors.push(color.r, color.g, color.b);
     }
@@ -315,7 +313,7 @@ class ShapeExplosion {
 
     this.material = new THREE.PointsMaterial({
       map: glowTexture,
-      size: 0.085,
+      size: 0.06, // ← 小さめ
       transparent: true,
       opacity: 1,
       blending: THREE.AdditiveBlending,
@@ -345,7 +343,7 @@ class ShapeExplosion {
     this.geometry.attributes.position.needsUpdate = true;
 
     const t = this.age / this.lifespan;
-    this.material.opacity = Math.pow(1 - t, 2);
+    this.material.opacity = Math.pow(1 - t, 1.5); // ← 濃さ長持ち
   }
 
   isDead() { return this.age > this.lifespan; }
@@ -382,7 +380,7 @@ setInterval(() => {
 // Background演出 (ハート・桜花火)
 // ===========================
 setInterval(() => {
-  if (Math.random() < 0.4) { // 40%の確率
+  if (Math.random() < 0.6) { // 40%の確率
     const numSpecial = Math.floor(Math.random() * 3) + 2; // 2〜4個
     for (let i = 0; i < numSpecial; i++) {
       const type = Math.random() < 0.5 ? "heart" : "sakura";
@@ -393,7 +391,7 @@ setInterval(() => {
       ), type));
     }
   }
-}, 2000); // 2秒ごとに判定
+}, 1000); // 2秒ごとに判定
 
 // ===========================
 // Render loop
