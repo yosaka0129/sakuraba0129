@@ -281,8 +281,8 @@ class ShapeExplosion {
       if (type === "heart") {
         const t = Math.random() * 2 * Math.PI;
         x = 8 * Math.pow(Math.sin(t), 3);
-        y = 6.5 * Math.cos(t) - 5 * Math.cos(2*t)
-          - 2 * Math.cos(3*t) - Math.cos(4*t);
+        y = 6.5 * Math.cos(t) - 2.5 * Math.cos(2*t)
+          - 1 * Math.cos(3*t) - 0.5*Math.cos(4*t);
 
         rx = x * cosA - y * sinA;
         ry = x * sinA + y * cosA;
@@ -331,7 +331,7 @@ class ShapeExplosion {
 
     this.material = new THREE.PointsMaterial({
       map: glowTexture,
-      size: type === "sakura" ? 0.16 : 0.14,
+      size: type === "sakura" ? 0.20 : 0.17,
       transparent: true,
       opacity: 1,
       blending: THREE.AdditiveBlending,
