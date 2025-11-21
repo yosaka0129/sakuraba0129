@@ -101,7 +101,11 @@ class FireworkBall {
     this.points.position.copy(position);
     scene.add(this.points);
 
-    this.velocity = new THREE.Vector3((Math.random() - 0.5) * 0.02, 0.12, 0);
+    this.velocity = new THREE.Vector3(
+       (Math.random() - 0.5) * 0.02,
+       0.09 + Math.random() * 0.03, // 0.09〜0.12 の範囲
+       0
+);
     this.trailPositions = [];
     this.maxTrail = 12;
   }
@@ -248,7 +252,7 @@ function launchFireworkSet() {
   for (let i = 0; i < numBalls; i++) {
     fireworks.push(new FireworkBall(new THREE.Vector3(
       (Math.random() - 0.5) * 6,     // X: 横方向をもっと広く
-      -3 + Math.random() * 2.5,        // Y: 下だけでなく上の方からもスタート
+      -3 + Math.random() * 2.0,        // Y: 下だけでなく上の方からもスタート
       -6 + Math.random() * 6         // Z: 奥行きもばらつかせる
     )));
   }
