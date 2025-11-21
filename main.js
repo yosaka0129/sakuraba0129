@@ -288,13 +288,14 @@ class ShapeExplosion {
         ry = x * sinA + y * cosA;
         vz = (Math.random() - 0.5) * 0.02;
 
-        this.positions[i*3+0] = rx * 0.009;
-        this.positions[i*3+1] = ry * 0.009;
+        // スケールを大きめに（Explosionの1/2）
+        this.positions[i*3+0] = rx * 0.05;
+        this.positions[i*3+1] = ry * 0.05;
         this.positions[i*3+2] = vz;
       } else if (type === "sakura") {
         const spikes = 5;
         const baseAngle = Math.floor(Math.random() * spikes) * (2 * Math.PI / spikes);
-        const radius = 0.08 + Math.random() * 0.04;
+        const radius = 0.3 + Math.random() * 0.2; // 半径を大きめに
         x = Math.cos(baseAngle) * radius;
         y = Math.sin(baseAngle) * radius;
 
@@ -307,7 +308,6 @@ class ShapeExplosion {
         this.positions[i*3+2] = vz;
       }
 
-      // 少し動きを与える
       this.velocities.push(new THREE.Vector3(
         (Math.random() - 0.5) * 0.01,
         (Math.random() - 0.5) * 0.01,
@@ -325,8 +325,8 @@ class ShapeExplosion {
       if (type === "sakura") {
         color = new THREE.Color().setHSL(
           0.95 + Math.random()*0.02,
-          0.9 + Math.random()*0.1,   // 彩度高め
-          0.45 + Math.random()*0.1   // 明度低めで濃ゆく
+          0.9 + Math.random()*0.1,
+          0.45 + Math.random()*0.1
         );
       } else {
         color = new THREE.Color().setHSL(
@@ -341,7 +341,7 @@ class ShapeExplosion {
 
     this.material = new THREE.PointsMaterial({
       map: glowTexture,
-      size: type === "sakura" ? 0.09 : 0.06, // 桜は太め
+      size: type === "sakura" ? 0.18 : 0.15, // 粒を大きめに
       transparent: true,
       opacity: 1,
       blending: THREE.AdditiveBlending,
