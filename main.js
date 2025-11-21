@@ -270,8 +270,8 @@ class ShapeExplosion {
     this.velocities = [];
     this.gravity = new THREE.Vector3(0, -0.0015, 0);
 
-    // ランダムな回転角度（形全体を±20°傾ける）
-    const angle = (Math.random() - 0.5) * (Math.PI / 9); // -20°〜+20°
+    // ランダムな回転角度（±20°）
+    const angle = (Math.random() - 0.5) * (Math.PI / 9);
     const cosA = Math.cos(angle);
     const sinA = Math.sin(angle);
 
@@ -288,14 +288,17 @@ class ShapeExplosion {
         ry = x * sinA + y * cosA;
         vz = (Math.random() - 0.5) * 0.02;
 
-        // スケールを大きめに（Explosionの1/2）
-        this.positions[i*3+0] = rx * 0.05;
-        this.positions[i*3+1] = ry * 0.05;
-        this.positions[i*3+2] = vz;
+        // 初期位置は中心に
+        this.positions[i*3+0] = 0;
+        this.positions[i*3+1] = 0;
+        this.positions[i*3+2] = 0;
+
+        // 広がり用の速度ベクトルに形を使う
+        this.velocities.push(new THREE.Vector3(rx * 0.05, ry * 0.05, vz));
       } else if (type === "sakura") {
         const spikes = 5;
         const baseAngle = Math.floor(Math.random() * spikes) * (2 * Math.PI / spikes);
-        const radius = 0.3 + Math.random() * 0.2; // 半径を大きめに
+        const radius = 0.3 + Math.random() * 0.2;
         x = Math.cos(baseAngle) * radius;
         y = Math.sin(baseAngle) * radius;
 
@@ -303,37 +306,25 @@ class ShapeExplosion {
         ry = x * sinA + y * cosA;
         vz = (Math.random() - 0.5) * 0.02;
 
-        this.positions[i*3+0] = rx;
-        this.positions[i*3+1] = ry;
-        this.positions[i*3+2] = vz;
-      }
+        this.positions[i*3+0] = 0;
+        this.positions[i*3+1] = 0;
+        this.positions[i*3+2] = 0;
 
-      this.velocities.push(new THREE.Vector3(
-        (Math.random() - 0.5) * 0.01,
-        (Math.random() - 0.5) * 0.01,
-        (Math.random() - 0.5) * 0.01
-      ));
+        this.velocities.push(new THREE.Vector3(rx, ry, vz));
+      }
     }
 
     this.geometry = new THREE.BufferGeometry();
     this.geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
 
-    // ピンク系カラー（桜は濃ゆく太く）
+    // ピンク系カラー
     this.colors = [];
     for (let i = 0; i < count; i++) {
       let color;
       if (type === "sakura") {
-        color = new THREE.Color().setHSL(
-          0.95 + Math.random()*0.02,
-          0.9 + Math.random()*0.1,
-          0.45 + Math.random()*0.1
-        );
+        color = new THREE.Color().setHSL(0.95 + Math.random()*0.02, 0.9 + Math.random()*0.1, 0.45 + Math.random()*0.1);
       } else {
-        color = new THREE.Color().setHSL(
-          0.95 + Math.random()*0.02,
-          0.7 + Math.random()*0.2,
-          0.55 + Math.random()*0.15
-        );
+        color = new THREE.Color().setHSL(0.95 + Math.random()*0.02, 0.7 + Math.random()*0.2, 0.55 + Math.random()*0.15);
       }
       this.colors.push(color.r, color.g, color.b);
     }
@@ -341,7 +332,7 @@ class ShapeExplosion {
 
     this.material = new THREE.PointsMaterial({
       map: glowTexture,
-      size: type === "sakura" ? 0.18 : 0.15, // 粒を大きめに
+      size: type === "sakura" ? 0.18 : 0.15,
       transparent: true,
       opacity: 1,
       blending: THREE.AdditiveBlending,
