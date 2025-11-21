@@ -270,49 +270,49 @@ class ShapeExplosion {
     this.velocities = [];
     this.gravity = new THREE.Vector3(0, -0.0015, 0);
 
+    // ランダムな回転角度（形全体を±20°傾ける）
+    const angle = (Math.random() - 0.5) * (Math.PI / 9); // -20°〜+20°
+    const cosA = Math.cos(angle);
+    const sinA = Math.sin(angle);
+
     for (let i = 0; i < count; i++) {
-      let vx, vy, vz;
+      let x, y, rx, ry, vz;
 
       if (type === "heart") {
         const t = Math.random() * 2 * Math.PI;
-        const x = 16 * Math.pow(Math.sin(t), 3);
-        const y = 13 * Math.cos(t) - 5 * Math.cos(2*t)
-                - 2 * Math.cos(3*t) - Math.cos(4*t);
+        x = 16 * Math.pow(Math.sin(t), 3);
+        y = 13 * Math.cos(t) - 5 * Math.cos(2*t)
+          - 2 * Math.cos(3*t) - Math.cos(4*t);
 
-        // ランダム傾き
-        const angle = (Math.random() - 0.5) * 0.9; // -25°〜+25°
-        const cosA = Math.cos(angle);
-        const sinA = Math.sin(angle);
-        const rx = x * cosA - y * sinA;
-        const ry = x * sinA + y * cosA;
-
-        const scale = 0.009;
-        vx = rx * scale;
-        vy = ry * scale;
+        rx = x * cosA - y * sinA;
+        ry = x * sinA + y * cosA;
         vz = (Math.random() - 0.5) * 0.02;
+
+        this.positions[i*3+0] = rx * 0.009;
+        this.positions[i*3+1] = ry * 0.009;
+        this.positions[i*3+2] = vz;
       } else if (type === "sakura") {
         const spikes = 5;
-        const angle = Math.floor(Math.random() * spikes) * (2 * Math.PI / spikes);
+        const baseAngle = Math.floor(Math.random() * spikes) * (2 * Math.PI / spikes);
         const radius = 0.08 + Math.random() * 0.04;
-        let sx = Math.cos(angle) * radius;
-        let sy = Math.sin(angle) * radius;
+        x = Math.cos(baseAngle) * radius;
+        y = Math.sin(baseAngle) * radius;
 
-        // 桜もランダム傾き
-        const tilt = (Math.random() - 0.5) * 0.9; // -25°〜+25°
-        const cosT = Math.cos(tilt);
-        const sinT = Math.sin(tilt);
-        const rx = sx * cosT - sy * sinT;
-        const ry = sx * sinT + sy * cosT;
-
-        vx = rx + (Math.random() - 0.5) * 0.02;
-        vy = ry + (Math.random() - 0.5) * 0.02;
+        rx = x * cosA - y * sinA;
+        ry = x * sinA + y * cosA;
         vz = (Math.random() - 0.5) * 0.02;
+
+        this.positions[i*3+0] = rx;
+        this.positions[i*3+1] = ry;
+        this.positions[i*3+2] = vz;
       }
 
-      this.positions[i*3+0] = 0;
-      this.positions[i*3+1] = 0;
-      this.positions[i*3+2] = 0;
-      this.velocities.push(new THREE.Vector3(vx, vy, vz));
+      // 少し動きを与える
+      this.velocities.push(new THREE.Vector3(
+        (Math.random() - 0.5) * 0.01,
+        (Math.random() - 0.5) * 0.01,
+        (Math.random() - 0.5) * 0.01
+      ));
     }
 
     this.geometry = new THREE.BufferGeometry();
@@ -408,13 +408,13 @@ setInterval(() => {
 // Background演出 (ハート・桜花火)
 // ===========================
 setInterval(() => {
-  if (Math.random() < 0.6) { // 40%の確率
-    const numSpecial = Math.floor(Math.random() * 3) + 2; // 2〜4個
+  if (Math.random() < 0.6) { // 60%の確率
+    const numSpecial = Math.floor(Math.random() * 2) + 3; // 2〜4個
     for (let i = 0; i < numSpecial; i++) {
       const type = Math.random() < 0.5 ? "heart" : "sakura";
       fireworks.push(new ShapeExplosion(new THREE.Vector3(
         (Math.random() - 0.5) * 6,   // 横方向
-        -1 + Math.random() * 3,      // 縦方向
+        -1 + Math.random() * 6,      // 縦方向
         -10 + Math.random() * 4      // 奥行き（背景に配置）
       ), type));
     }
