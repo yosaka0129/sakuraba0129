@@ -310,7 +310,7 @@ class ShapeExplosion {
         this.positions[i*3+2] = 0;
 
         // 桜 → 最終的に花火の1/4 ≒ 横幅の25%
-        this.velocities.push(new THREE.Vector3(rx * 0.02, ry * 0.02, vz));
+        this.velocities.push(new THREE.Vector3(rx * 0.07, ry * 0.07, vz));
       }
     }
 
@@ -355,7 +355,7 @@ class ShapeExplosion {
 
     // typeごとに減衰を分ける
     if (this.type === "heart") {
-      v.multiplyScalar(0.93); // ハート
+      v.multiplyScalar(0.80); // ハート
     } else if (this.type === "sakura") {
       v.multiplyScalar(0.99); // 桜 →
     }
