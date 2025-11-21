@@ -293,7 +293,7 @@ class ShapeExplosion {
         this.positions[i*3+2] = 0;
 
         // ハート → 最終的に花火の2/5 ≒ 横幅の40%
-        this.velocities.push(new THREE.Vector3(rx * 0.015, ry * 0.015, vz));
+        this.velocities.push(new THREE.Vector3(rx * 0.01, ry * 0.01, vz));
       } else if (type === "sakura") {
         const spikes = 5;
         const baseAngle = Math.floor(Math.random() * spikes) * (2 * Math.PI / spikes);
@@ -310,7 +310,7 @@ class ShapeExplosion {
         this.positions[i*3+2] = 0;
 
         // 桜 → 最終的に花火の1/4 ≒ 横幅の25%
-        this.velocities.push(new THREE.Vector3(rx * 0.01, ry * 0.01, vz));
+        this.velocities.push(new THREE.Vector3(rx * 0.02, ry * 0.0, vz));
       }
     }
 
@@ -352,7 +352,7 @@ class ShapeExplosion {
     this.age++;
     for (let i = 0; i < this.velocities.length; i++) {
       const v = this.velocities[i];
-      v.multiplyScalar(0.97); // 共通の減衰で収束
+      v.multiplyScalar(0.95); // 共通の減衰で収束
       v.add(this.gravity);
       this.positions[i*3+0] += v.x;
       this.positions[i*3+1] += v.y;
