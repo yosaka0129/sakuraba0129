@@ -86,7 +86,10 @@ class FireworkBall {
     this.lifespan = 50;
 
     this.geometry = new THREE.BufferGeometry();
-    this.geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3));
+    this.geometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3)
+    );
     this.material = new THREE.PointsMaterial({
       map: glowTexture,
       color: 0xffffff,
@@ -102,10 +105,10 @@ class FireworkBall {
     scene.add(this.points);
 
     this.velocity = new THREE.Vector3(
-       (Math.random() - 0.5) * 0.02,
-       0.09 + Math.random() * 0.03, // 0.09〜0.12 の範囲
-       0
-);
+      (Math.random() - 0.5) * 0.02,
+      0.09 + Math.random() * 0.03, // 打ち上げ速度 0.09〜0.12
+      0
+    );
     this.trailPositions = [];
     this.maxTrail = 12;
   }
@@ -113,8 +116,9 @@ class FireworkBall {
   update() {
     this.age++;
     this.points.position.add(this.velocity);
-    this.velocity.y -= 0.002;
+    this.velocity.y -= 0.002; // 重力
 
+    // 残像（トレイル）
     this.trailPositions.push(this.points.position.clone());
     if (this.trailPositions.length > this.maxTrail) this.trailPositions.shift();
 
@@ -137,9 +141,14 @@ class FireworkBall {
       const p = new THREE.Points(geo, mat);
       p.position.copy(pos);
       scene.add(p);
-      setTimeout(() => { scene.remove(p); geo.dispose(); mat.dispose(); }, 160);
+      setTimeout(() => {
+        scene.remove(p);
+        geo.dispose();
+        mat.dispose();
+      }, 160);
     }
 
+    // 寿命で爆発
     if (this.age >= this.lifespan) {
       fireworks.push(new Explosion(this.points.position.clone(), false));
       scene.remove(this.points);
@@ -251,9 +260,9 @@ function launchFireworkSet() {
   const numBalls = 2 + Math.floor(Math.random() * 4); // 2〜4個
   for (let i = 0; i < numBalls; i++) {
     fireworks.push(new FireworkBall(new THREE.Vector3(
-      (Math.random() - 0.5) * 6,     // X: 横方向をもっと広く
-      -3 + Math.random() * 2.0,        // Y: 下だけでなく上の方からもスタート
-      -6 + Math.random() * 6         // Z: 奥行きもばらつかせる
+      (Math.random() - 0.5) * 6,   // 横方向を広く
+      -3 + Math.random() * 2.0,    // 下〜上の方からもスタート
+      -6 + Math.random() * 6       // 奥行きもばらつかせる
     )));
   }
 }
@@ -274,7 +283,6 @@ function animate() {
   for (let i = fireworks.length - 1; i >= 0; i--) {
     fireworks[i].update();
     if (fireworks[i].isDead()) {
-      // Explosion の場合は dispose() を呼んでリソース解放
       if (fireworks[i] instanceof Explosion) {
         fireworks[i].dispose();
       }
