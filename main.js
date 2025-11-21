@@ -293,12 +293,12 @@ class ShapeExplosion {
         this.positions[i*3+1] = 0;
         this.positions[i*3+2] = 0;
 
-        // 広がり用の速度ベクトルに形を使う
-        this.velocities.push(new THREE.Vector3(rx * 0.05, ry * 0.05, vz));
+        // velocityを半分にして最終サイズをExplosionの1/2に
+        this.velocities.push(new THREE.Vector3(rx * 0.025, ry * 0.025, vz));
       } else if (type === "sakura") {
         const spikes = 5;
         const baseAngle = Math.floor(Math.random() * spikes) * (2 * Math.PI / spikes);
-        const radius = 0.3 + Math.random() * 0.2;
+        const radius = 0.15 + Math.random() * 0.1; // 半径を控えめに
         x = Math.cos(baseAngle) * radius;
         y = Math.sin(baseAngle) * radius;
 
@@ -310,7 +310,7 @@ class ShapeExplosion {
         this.positions[i*3+1] = 0;
         this.positions[i*3+2] = 0;
 
-        this.velocities.push(new THREE.Vector3(rx, ry, vz));
+        this.velocities.push(new THREE.Vector3(rx * 0.5, ry * 0.5, vz)); // 広がりを半分に
       }
     }
 
@@ -332,7 +332,7 @@ class ShapeExplosion {
 
     this.material = new THREE.PointsMaterial({
       map: glowTexture,
-      size: type === "sakura" ? 0.18 : 0.15,
+      size: type === "sakura" ? 0.18 : 0.15, // 粒は太めのまま
       transparent: true,
       opacity: 1,
       blending: THREE.AdditiveBlending,
