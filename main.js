@@ -279,33 +279,28 @@ class ShapeExplosion {
       let x, y, rx, ry, vz;
 
       if (type === "heart") {
-        // ハート型の座標式
         const t = Math.random() * 2 * Math.PI;
         x = 16 * Math.pow(Math.sin(t), 3);
         y = 13 * Math.cos(t) - 5 * Math.cos(2*t)
           - 2 * Math.cos(3*t) - Math.cos(4*t);
 
-        // 2D回転
         rx = x * cosA - y * sinA;
         ry = x * sinA + y * cosA;
         vz = (Math.random() - 0.5) * 0.02;
 
-        // 初期位置は中心
         this.positions[i*3+0] = 0;
         this.positions[i*3+1] = 0;
         this.positions[i*3+2] = 0;
 
-        // 控えめに爆発 → 最終的に花火の1/3に収束
+        // ハート → 最終的に花火の2/5 ≒ 横幅の40%
         this.velocities.push(new THREE.Vector3(rx * 0.015, ry * 0.015, vz));
       } else if (type === "sakura") {
-        // 桜型（五角形放射状）
         const spikes = 5;
         const baseAngle = Math.floor(Math.random() * spikes) * (2 * Math.PI / spikes);
-        const radius = 0.25 + Math.random() * 0.1; // 花びらを大きめに
+        const radius = 0.25 + Math.random() * 0.1;
         x = Math.cos(baseAngle) * radius;
         y = Math.sin(baseAngle) * radius;
 
-        // 2D回転
         rx = x * cosA - y * sinA;
         ry = x * sinA + y * cosA;
         vz = (Math.random() - 0.5) * 0.02;
@@ -314,30 +309,21 @@ class ShapeExplosion {
         this.positions[i*3+1] = 0;
         this.positions[i*3+2] = 0;
 
-        // 控えめに爆発 → 最終的に花火の1/4に収束
-        this.velocities.push(new THREE.Vector3(rx * 0.012, ry * 0.012, vz));
+        // 桜 → 最終的に花火の1/4 ≒ 横幅の25%
+        this.velocities.push(new THREE.Vector3(rx * 0.01, ry * 0.01, vz));
       }
     }
 
     this.geometry = new THREE.BufferGeometry();
     this.geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
 
-    // ピンク系カラー
     this.colors = [];
     for (let i = 0; i < count; i++) {
       let color;
       if (type === "sakura") {
-        color = new THREE.Color().setHSL(
-          0.95 + Math.random()*0.02,
-          0.9 + Math.random()*0.1,
-          0.45 + Math.random()*0.1
-        );
+        color = new THREE.Color().setHSL(0.95 + Math.random()*0.02, 0.9 + Math.random()*0.1, 0.45 + Math.random()*0.1);
       } else {
-        color = new THREE.Color().setHSL(
-          0.95 + Math.random()*0.02,
-          0.7 + Math.random()*0.2,
-          0.55 + Math.random()*0.15
-        );
+        color = new THREE.Color().setHSL(0.95 + Math.random()*0.02, 0.7 + Math.random()*0.2, 0.55 + Math.random()*0.15);
       }
       this.colors.push(color.r, color.g, color.b);
     }
@@ -345,7 +331,7 @@ class ShapeExplosion {
 
     this.material = new THREE.PointsMaterial({
       map: glowTexture,
-      size: type === "sakura" ? 0.18 : 0.15, // 桜は少し大きめ
+      size: type === "sakura" ? 0.16 : 0.14,
       transparent: true,
       opacity: 1,
       blending: THREE.AdditiveBlending,
@@ -366,7 +352,7 @@ class ShapeExplosion {
     this.age++;
     for (let i = 0; i < this.velocities.length; i++) {
       const v = this.velocities[i];
-      v.multiplyScalar(0.97); // ← 控えめに広がって収束
+      v.multiplyScalar(0.97); // 共通の減衰で収束
       v.add(this.gravity);
       this.positions[i*3+0] += v.x;
       this.positions[i*3+1] += v.y;
