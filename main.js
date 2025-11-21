@@ -4,8 +4,8 @@ import * as THREE from 'https://unpkg.com/three@0.181.0/build/three.module.js';
 // Web Audio
 // ===========================
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-let fireworkBuffer2 = null; // 一段目
-let fireworkBuffer = null;  // 二段目
+let fireworkBuffer2 = null;
+let fireworkBuffer = null;
 let audioEnabled = false;
 
 fetch('./sounds/firework2.mp3')
@@ -38,7 +38,10 @@ document.getElementById("enableSound").addEventListener("click", () => {
 // ===========================
 const video = document.getElementById("camera");
 navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })
-  .then(stream => { video.srcObject = stream; })
+  .then(stream => {
+    video.srcObject = stream;
+    video.play().catch(err => console.error("再生失敗:", err));
+  })
   .catch(err => console.error("カメラ取得失敗:", err));
 
 // ===========================
@@ -75,7 +78,7 @@ window.addEventListener('resize', () => {
 const glowTexture = new THREE.TextureLoader().load('./textures/glow.png');
 
 // ===========================
-// Firework ball (launch)
+// FireworkBall class
 // ===========================
 class FireworkBall {
   constructor(position = new THREE.Vector3(0, -2, -5)) {
@@ -83,7 +86,6 @@ class FireworkBall {
     this.lifespan = 50;
 
     this.geometry = new THREE.BufferGeometry();
-    // PointsGeometry expects some position; we keep a single vertex at origin of the Points object
     this.geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3));
     this.material = new THREE.PointsMaterial({
       map: glowTexture,
@@ -99,30 +101,19 @@ class FireworkBall {
     this.points.position.copy(position);
     scene.add(this.points);
 
-    // Upward velocity with slight horizontal randomness
-    this.velocity = new THREE.Vector3(
-      (Math.random() - 0.5) * 0.02,
-      0.12,
-      0
-    );
-
-    // simple trail positions buffer
+    this.velocity = new THREE.Vector3((Math.random() - 0.5) * 0.02, 0.12, 0);
     this.trailPositions = [];
     this.maxTrail = 12;
   }
 
   update() {
     this.age++;
-
-    // move
     this.points.position.add(this.velocity);
-    this.velocity.y -= 0.002; // gravity
+    this.velocity.y -= 0.002;
 
-    // trail: store positions and render faint glow sprites
     this.trailPositions.push(this.points.position.clone());
     if (this.trailPositions.length > this.maxTrail) this.trailPositions.shift();
 
-    // draw trail as lightweight transient points
     for (let i = 0; i < this.trailPositions.length; i++) {
       const pos = this.trailPositions[i];
       const alpha = 1 - i / this.trailPositions.length;
@@ -142,11 +133,9 @@ class FireworkBall {
       const p = new THREE.Points(geo, mat);
       p.position.copy(pos);
       scene.add(p);
-      // remove tiny trail point shortly to avoid resource buildup
       setTimeout(() => { scene.remove(p); geo.dispose(); mat.dispose(); }, 160);
     }
 
-    // transition to explosion
     if (this.age >= this.lifespan) {
       fireworks.push(new Explosion(this.points.position.clone(), false));
       scene.remove(this.points);
@@ -160,7 +149,7 @@ class FireworkBall {
 }
 
 // ===========================
-// Explosion (uniform color per firework)
+// Explosion class
 // ===========================
 class Explosion {
   constructor(position, isSecond = false) {
@@ -187,7 +176,6 @@ class Explosion {
     this.geometry = new THREE.BufferGeometry();
     this.geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
 
-    // Choose a unified color per explosion
     const hue = Math.random();
     this.material = new THREE.PointsMaterial({
       map: glowTexture,
@@ -209,17 +197,14 @@ class Explosion {
     this.explodedOnce = false;
     this.shouldExplodeTwice = Math.random() < 0.4;
 
-    // sound
-    playSound(isSecond ? firework : fireworkBuffer2);
+    playSound(isSecond ? fireworkBuffer : fireworkBuffer2);
   }
 
   update() {
     this.age++;
-
-    // physics update
     for (let i = 0; i < this.velocities.length; i++) {
       const v = this.velocities[i];
-      v.multiplyScalar(0.983); // mild drag for cohesion
+      v.multiplyScalar(0.983);
       v.add(this.gravity);
       this.positions[i * 3 + 0] += v.x;
       this.positions[i * 3 + 1] += v.y;
@@ -227,9 +212,7 @@ class Explosion {
     }
     this.geometry.attributes.position.needsUpdate = true;
 
-    // flash phase then decay
     if (this.age < 10) {
-      // intense flash
       this.material.opacity = 1.0;
       this.material.size = 0.10;
     } else {
@@ -238,10 +221,8 @@ class Explosion {
       this.material.size = 0.085;
     }
 
-    // second burst
     if (this.age === 30 && this.shouldExplodeTwice && !this.explodedOnce) {
       fireworks.push(new Explosion(this.points.position.clone(), true));
-      // two-stage sound second time
       playSound(fireworkBuffer);
       this.explodedOnce = true;
     }
@@ -273,6 +254,7 @@ function launchFireworkSet() {
   }
 }
 
+// 花火を定期的に打ち上げる
 setInterval(() => {
   if (fireworks.length < MAX_FIREWORKS) {
     launchFireworkSet();
@@ -288,6 +270,10 @@ function animate() {
   for (let i = fireworks.length - 1; i >= 0; i--) {
     fireworks[i].update();
     if (fireworks[i].isDead()) {
+      // Explosion の場合は dispose() を呼んでリソース解放
+      if (fireworks[i] instanceof Explosion) {
+        fireworks[i].dispose();
+      }
       fireworks.splice(i, 1);
     }
   }
