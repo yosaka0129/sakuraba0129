@@ -260,6 +260,9 @@ class Explosion {
 // ===========================
 // ShapeExplosion class (ハート・桜花火、ピンク限定)
 // ===========================
+// ===========================
+// ShapeExplosion class (ハート・桜花火、ピンク限定)
+// ===========================
 class ShapeExplosion {
   constructor(position, type = "heart") {
     const count = 500;
@@ -271,18 +274,28 @@ class ShapeExplosion {
       let vx, vy, vz;
 
       if (type === "heart") {
-        const t = Math.random() * 2 * Math.PI; // ← 修正済み
+        // ハート型の座標式
+        const t = Math.random() * 2 * Math.PI; // 0〜2πで完全なハート
         const x = 16 * Math.pow(Math.sin(t), 3);
         const y = 13 * Math.cos(t) - 5 * Math.cos(2*t)
                 - 2 * Math.cos(3*t) - Math.cos(4*t);
-        const scale = 0.009; // ← 少し小さめに
-        vx = x * scale;
-        vy = y * scale;
+
+        // ランダムな左右の傾き（斜めハート）
+        const angle = (Math.random() - 0.5) * 0.6; // -0.3〜+0.3 rad
+        const cosA = Math.cos(angle);
+        const sinA = Math.sin(angle);
+        const rx = x * cosA - y * sinA;
+        const ry = x * sinA + y * cosA;
+
+        const scale = 0.009; // 少し小さめ
+        vx = rx * scale;
+        vy = ry * scale;
         vz = (Math.random() - 0.5) * 0.02;
       } else if (type === "sakura") {
+        // 桜型（五角形の花びら風）
         const spikes = 5;
         const angle = Math.floor(Math.random() * spikes) * (2 * Math.PI / spikes);
-        const radius = 0.07 + Math.random() * 0.03; // ← 少し小さめに
+        const radius = 0.08 + Math.random() * 0.04;
         vx = Math.cos(angle) * radius;
         vy = Math.sin(angle) * radius;
         vx += (Math.random() - 0.5) * 0.02;
@@ -299,21 +312,30 @@ class ShapeExplosion {
     this.geometry = new THREE.BufferGeometry();
     this.geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
 
-    // ピンクを濃ゆく派手に
+    // ピンク系カラー（桜は濃ゆく太く）
     this.colors = [];
     for (let i = 0; i < count; i++) {
-      const color = new THREE.Color().setHSL(
-        0.95 + Math.random()*0.02, // ピンク系
-        0.85 + Math.random()*0.15, // 彩度高め
-        0.5 + Math.random()*0.1    // 明度低めで濃ゆく
-      );
+      let color;
+      if (type === "sakura") {
+        color = new THREE.Color().setHSL(
+          0.95 + Math.random()*0.02, // ピンク系
+          0.9 + Math.random()*0.1,   // 彩度高め
+          0.45 + Math.random()*0.1   // 明度低めで濃ゆく
+        );
+      } else {
+        color = new THREE.Color().setHSL(
+          0.95 + Math.random()*0.02,
+          0.7 + Math.random()*0.2,
+          0.55 + Math.random()*0.15
+        );
+      }
       this.colors.push(color.r, color.g, color.b);
     }
     this.geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.colors, 3));
 
     this.material = new THREE.PointsMaterial({
       map: glowTexture,
-      size: 0.06, // ← 小さめ
+      size: type === "sakura" ? 0.08 : 0.06, // 桜は太め
       transparent: true,
       opacity: 1,
       blending: THREE.AdditiveBlending,
@@ -343,7 +365,7 @@ class ShapeExplosion {
     this.geometry.attributes.position.needsUpdate = true;
 
     const t = this.age / this.lifespan;
-    this.material.opacity = Math.pow(1 - t, 1.5); // ← 濃さ長持ち
+    this.material.opacity = Math.pow(1 - t, 1.5); // 濃さ長持ち
   }
 
   isDead() { return this.age > this.lifespan; }
@@ -354,7 +376,6 @@ class ShapeExplosion {
     this.material.dispose();
   }
 }
-
 // ===========================
 // Launch management (メイン花火)
 // ===========================
