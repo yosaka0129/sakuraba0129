@@ -310,7 +310,7 @@ class ShapeExplosion {
         this.positions[i*3+2] = 0;
 
         // 桜 → 最終的に花火の1/4 ≒ 横幅の25%
-        this.velocities.push(new THREE.Vector3(rx * 0.02, ry * 0.0, vz));
+        this.velocities.push(new THREE.Vector3(rx * 0.02, ry * 0.02, vz));
       }
     }
 
@@ -349,20 +349,28 @@ class ShapeExplosion {
   }
 
   update() {
-    this.age++;
-    for (let i = 0; i < this.velocities.length; i++) {
-      const v = this.velocities[i];
-      v.multiplyScalar(0.95); // 共通の減衰で収束
-      v.add(this.gravity);
-      this.positions[i*3+0] += v.x;
-      this.positions[i*3+1] += v.y;
-      this.positions[i*3+2] += v.z;
-    }
-    this.geometry.attributes.position.needsUpdate = true;
+  this.age++;
+  for (let i = 0; i < this.velocities.length; i++) {
+    const v = this.velocities[i];
 
-    const t = this.age / this.lifespan;
-    this.material.opacity = Math.pow(1 - t, 1.5);
+    // typeごとに減衰を分ける
+    if (this.type === "heart") {
+      v.multiplyScalar(0.93); // ハート
+    } else if (this.type === "sakura") {
+      v.multiplyScalar(0.99); // 桜 →
+    }
+
+    v.add(this.gravity);
+    this.positions[i*3+0] += v.x;
+    this.positions[i*3+1] += v.y;
+    this.positions[i*3+2] += v.z;
   }
+  this.geometry.attributes.position.needsUpdate = true;
+
+  const t = this.age / this.lifespan;
+  this.material.opacity = Math.pow(1 - t, 1.5);
+  }
+
 
   isDead() { return this.age > this.lifespan; }
 
