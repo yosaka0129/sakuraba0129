@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>写真トリミング</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Cropper.js 読み込み -->
+  <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css">
+</head>
+<body>
+  <h2>写真をアップロードしてトリミング</h2>
+  <input type="file" id="upload" accept="image/*">
+  <button id="rotateBtn">回転</button>
+  <button id="confirmBtn">確定</button>
+  <div id="cropArea"></div>
+
+  <!-- Cropper.js 読み込み -->
+  <script src="https://unpkg.com/cropperjs"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+body {
+  background-color: #ffe4e1;
+  text-align: center;
+  font-family: sans-serif;
+}
+button, #upload {
+  margin: 10px;
+  padding: 12px 20px;
+  font-size: 18px;
+  border-radius: 8px;
+  border: none;
+  background-color: #ffb6c1;
+  color: white;
+}
+#canvas {
+  border: 2px solid #ff69b4;
+  margin: 10px auto;
+  display: block;
+  max-width: 100%;
+}
+.category {
+  margin-top: 15px;
+  overflow-x: auto;
+  white-space: nowrap;
+  display: none;
+}
+.category img {
+  width: 80px;
+  height: 80px;
+  margin: 5px;
+  border: 2px solid #ff69b4;
+  border-radius: 10px;
+  background-color: white;
+  cursor: pointer;
+}

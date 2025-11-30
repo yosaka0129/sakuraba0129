@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>デコレーション</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>デコレーション画面</h2>
+  <canvas id="canvas"></canvas>
+  <button id="undoBtn">戻る</button>
+  <button id="deleteBtn">消去</button>
+  <button id="saveBtn">保存</button>
+
+  <div id="tabs">
+    <button onclick="showCategory('frames')">フレーム</button>
+    <button onclick="showCategory('stamps')">スタンプ</button>
+    <button onclick="showCategory('phrases')">フレーズ</button>
+  </div>
+
+  <div id="frames" class="category"></div>
+  <div id="stamps" class="category"></div>
+  <div id="phrases" class="category"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
