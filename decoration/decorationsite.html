@@ -10,12 +10,21 @@
 <body>
   <h2>写真をアップロードしてトリミング</h2>
   <input type="file" id="upload" accept="image/*">
-  <button id="rotateBtn">回転</button>
+
+  <!-- 回転ハンドル（ドラッグで回転） -->
+  <div id="rotateHandle" style="
+    width:60px; height:60px; border-radius:50%;
+    background:#ffb6c1; text-align:center; line-height:60px;
+    margin:10px; cursor:pointer; user-select:none;">
+    ↻
+  </div>
+
   <button id="confirmBtn">確定</button>
   <div id="cropArea"></div>
 
   <!-- Cropper.js 読み込み -->
   <script src="https://unpkg.com/cropperjs"></script>
-  <script src="script.js"></script>
+  <!-- トリミング専用JS -->
+  <script src="trimming.js"></script>
 </body>
 </html>
