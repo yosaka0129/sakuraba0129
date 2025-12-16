@@ -5,7 +5,7 @@
   <title>写真トリミング</title>
   <style>
     body {
-      background-color: #ffeef4; /* 薄いピンク */
+      background-color: #ffeef4; /* 薄ピンク */
       font-family: "Hiragino Kaku Gothic ProN", sans-serif;
       text-align: center;
       padding: 10px;
@@ -18,9 +18,9 @@
       background-color: white;
     }
     input[type="file"] {
-      font-size: 18px;
-      padding: 8px;
-      border-radius: 8px;
+      font-size: 22px;
+      padding: 12px;
+      border-radius: 10px;
       background-color: #fff0f5;
       border: 2px solid #ff99bb;
     }
@@ -36,34 +36,52 @@
     .right-controls {
       display: flex;
       justify-content: flex-end;
+      align-items: center;
     }
     .dpad {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-    .dpad div {
+    .dpad .horizontal {
       display: flex;
       justify-content: center;
     }
     .dpad button {
-      width: 60px;
-      height: 60px;
-      margin: 6px;
-      font-size: 24px;
-      border-radius: 10px;
+      width: 100px;   /* さらに大きく */
+      height: 100px;
+      margin: 10px;
+      font-size: 32px;
+      border-radius: 16px;
       background-color: #ffc0cb;
       border: none;
     }
     input[type="range"] {
-      width: 80%;
-      margin: 10px 0;
+      width: 95%;
+      height: 60px;   /* バーを太く */
+      margin: 20px 0;
+      accent-color: #ff6699;
+    }
+    /* スライダーの丸いつまみを大きく */
+    input[type="range"]::-webkit-slider-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ff6699;
+      cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ff6699;
+      cursor: pointer;
     }
     #confirmBtn {
-      margin-top: 20px;
-      font-size: 20px;
-      padding: 10px 30px;
-      border-radius: 12px;
+      margin-top: 25px;
+      font-size: 26px;
+      padding: 15px 50px;
+      border-radius: 16px;
       background-color: #ff99bb;
       color: white;
       border: none;
@@ -86,7 +104,7 @@
     <div class="right-controls">
       <div class="dpad">
         <button id="moveUp">↑</button>
-        <div>
+        <div class="horizontal">
           <button id="moveLeft">←</button>
           <button id="moveRight">→</button>
         </div>
