@@ -4,27 +4,20 @@
   <meta charset="UTF-8">
   <title>写真トリミング</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Cropper.js 読み込み -->
-  <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css">
 </head>
 <body>
   <h2>写真をアップロードしてトリミング</h2>
-  <input type="file" id="upload" accept="image/*">
+  <input type="file" id="upload" accept="image/*"><br><br>
 
-  <!-- 回転ハンドル -->
-  <div id="rotateHandle" style="
-    width:60px; height:60px; border-radius:50%;
-    background:#ffb6c1; text-align:center; line-height:60px;
-    margin:10px; cursor:pointer; user-select:none;">
-    ↻
-  </div>
+  <!-- 操作用スライダー -->
+  拡大縮小: <input type="range" id="scaleRange" min="0.5" max="2" step="0.01" value="1"><br>
+  回転: <input type="range" id="rotateRange" min="0" max="360" step="1" value="0"><br><br>
 
   <button id="confirmBtn">確定</button>
-  <div id="cropArea" style="position:relative;"></div>
 
-  <!-- Cropper.js 読み込み -->
-  <script src="https://unpkg.com/cropperjs"></script>
-  <!-- トリミング専用JS -->
+  <!-- トリミング用キャンバス -->
+  <canvas id="trimCanvas" width="400" height="400" style="border:1px solid #ccc;"></canvas>
+
   <script src="trimming.js"></script>
 </body>
 </html>

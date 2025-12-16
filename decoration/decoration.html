@@ -2,22 +2,27 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>写真トリミング</title>
+  <title>デコレーション</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>写真をアップロードしてトリミング</h2>
-  <input type="file" id="upload" accept="image/*"><br><br>
+  <h2>デコレーション画面</h2>
+  <canvas id="canvas"></canvas>
+  <button id="undoBtn">戻る</button>
+  <button id="deleteBtn">消去</button>
+  <button id="saveBtn">保存</button>
 
-  <!-- 操作用スライダー -->
-  拡大縮小: <input type="range" id="scaleRange" min="0.5" max="2" step="0.01" value="1"><br>
-  回転: <input type="range" id="rotateRange" min="0" max="360" step="1" value="0"><br><br>
+  <div id="tabs">
+    <button onclick="showCategory('frames')">フレーム</button>
+    <button onclick="showCategory('stamps')">スタンプ</button>
+    <button onclick="showCategory('phrases')">フレーズ</button>
+  </div>
 
-  <button id="confirmBtn">確定</button>
+  <div id="frames" class="category"></div>
+  <div id="stamps" class="category"></div>
+  <div id="phrases" class="category"></div>
 
-  <!-- トリミング用キャンバス -->
-  <canvas id="trimCanvas" width="400" height="400" style="border:1px solid #ccc;"></canvas>
-
-  <script src="trimming.js"></script>
+  <!-- デコレーション専用JS -->
+  <script src="decoration.js"></script>
 </body>
 </html>
