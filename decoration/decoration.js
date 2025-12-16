@@ -4,18 +4,22 @@ if (canvas) {
   canvas.width = window.innerWidth * 0.9;
   canvas.height = window.innerHeight * 0.6;
 
+  // トリミング済み写真を読み込む
   let photo = new Image();
   photo.src = sessionStorage.getItem("croppedPhoto");
   photo.onload = () => draw();
 
+  // スタンプやフレームの管理
   let placedStamps = [];
   let selectedStamp = null;
   let currentStamp = null;
   let currentFrame = null;
 
+  // 描画処理
   function draw() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
+    // 写真をキャンバス中央にフィットさせて描画
     if (photo) {
       const scale = Math.min(canvas.width / photo.width, canvas.height / photo.height);
       const drawWidth = photo.width * scale;
@@ -25,6 +29,7 @@ if (canvas) {
       ctx.drawImage(photo, x, y, drawWidth, drawHeight);
     }
 
+    // スタンプを描画
     placedStamps.forEach(s => {
       ctx.save();
       ctx.translate(s.x, s.y);
@@ -38,11 +43,13 @@ if (canvas) {
       ctx.restore();
     });
 
+    // フレームを最上層に描画
     if (currentFrame) {
       ctx.drawImage(currentFrame,0,0,canvas.width,canvas.height);
     }
   }
 
+  // キャンバスクリックでスタンプ選択 or 新規配置
   canvas.onclick = e => {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -57,11 +64,13 @@ if (canvas) {
     }
   };
 
+  // 戻る（最後のスタンプ削除）
   document.getElementById('undoBtn').onclick = () => {
     placedStamps.pop();
     draw();
   };
 
+  // 選択スタンプ削除
   document.getElementById('deleteBtn').onclick = () => {
     if (selectedStamp) {
       placedStamps = placedStamps.filter(s => s !== selectedStamp);
@@ -70,6 +79,7 @@ if (canvas) {
     }
   };
 
+  // 保存（完成画像をPNGとしてダウンロード）
   document.getElementById('saveBtn').onclick = () => {
     const link = document.createElement('a');
     link.download = 'decorated.png';
@@ -77,6 +87,7 @@ if (canvas) {
     link.click();
   };
 
+  // カテゴリ読み込み（frames, stamps, phrases）
   function loadCategory(name) {
     fetch(`assets/${name}/list.json`)
       .then(res => res.json())
@@ -96,6 +107,7 @@ if (canvas) {
       });
   }
 
+  // カテゴリ切り替え
   function showCategory(name) {
     document.querySelectorAll('.category').forEach(div => {
       div.style.display = 'none';
@@ -104,6 +116,7 @@ if (canvas) {
     if (target) target.style.display = 'block';
   }
 
+  // 初期化
   ["frames","stamps","phrases"].forEach(loadCategory);
   showCategory("stamps");
 }
