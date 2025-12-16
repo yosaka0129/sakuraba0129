@@ -38,17 +38,26 @@
       justify-content: flex-end;
       align-items: center;
     }
+    /* 十字キーを横広がりに配置（見た目だけ90°回転） */
     .dpad {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+    .vertical {
+      display: flex;
+      flex-direction: column; /* ↑↓を縦に並べる */
       align-items: center;
     }
-    .dpad .horizontal {
+    .horizontal {
       display: flex;
-      justify-content: center;
+      flex-direction: row; /* ←→を横に並べる */
+      align-items: center;
     }
     .dpad button {
-      width: 100px;   /* さらに大きく */
+      width: 100px;
       height: 100px;
       margin: 10px;
       font-size: 32px;
@@ -58,21 +67,21 @@
     }
     input[type="range"] {
       width: 95%;
-      height: 60px;   /* バーを太く */
-      margin: 20px 0;
+      height: 70px;   /* バーをさらに太く */
+      margin: 25px 0;
       accent-color: #ff6699;
     }
-    /* スライダーの丸いつまみを大きく */
+    /* スライダーの丸いつまみをさらに大きく */
     input[type="range"]::-webkit-slider-thumb {
-      width: 40px;
-      height: 40px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       background: #ff6699;
       cursor: pointer;
     }
     input[type="range"]::-moz-range-thumb {
-      width: 40px;
-      height: 40px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       background: #ff6699;
       cursor: pointer;
@@ -103,12 +112,15 @@
     </div>
     <div class="right-controls">
       <div class="dpad">
-        <button id="moveUp">↑</button>
+        <!-- 上下を縦に、左右を横に配置 -->
+        <div class="vertical">
+          <button id="moveUp">↑</button>
+          <button id="moveDown">↓</button>
+        </div>
         <div class="horizontal">
           <button id="moveLeft">←</button>
           <button id="moveRight">→</button>
         </div>
-        <button id="moveDown">↓</button>
       </div>
     </div>
   </div>
