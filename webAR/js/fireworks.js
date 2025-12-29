@@ -195,3 +195,124 @@ export class Explosion {
     this.material.dispose();
   }
 }
+
+// ---------------- ShapeExplosion（追加済み） ----------------
+export class ShapeExplosion {
+  constructor(position, type = "heart") {
+    this.type = type;
+
+    const count = 500;
+    this.positions = new Float32Array(count * 3);
+    this.velocities = [];
+    this.gravity = new THREE.Vector3(0, -0.0015, 0);
+
+    const angle = (Math.random() - 0.5) * (Math.PI / 6);
+    const cosA = Math.cos(angle);
+    const sinA = Math.sin(angle);
+
+    for (let i = 0; i < count; i++) {
+      let x, y, rx, ry, vz;
+
+      if (type === "heart") {
+        const t = Math.random() * 2 * Math.PI;
+        x = 8 * Math.pow(Math.sin(t), 3);
+        y = 6.5 * Math.cos(t) - 2.5 * Math.cos(2*t)
+          - 1 * Math.cos(3*t) - 0.5*Math.cos(4*t);
+
+        rx = x * cosA - y * sinA;
+        ry = x * sinA + y * cosA;
+        vz = (Math.random() - 0.5) * 0.02;
+
+        this.positions[i*3+0] = 0;
+        this.positions[i*3+1] = 0;
+        this.positions[i*3+2] = 0;
+
+        this.velocities.push(new THREE.Vector3(rx * 0.01, ry * 0.01, vz));
+
+      } else if (type === "sakura") {
+        const spikes = 5;
+        const baseAngle = Math.floor(Math.random() * spikes) * (2 * Math.PI / spikes);
+        const radius = 0.35 + Math.random() * 0.1;
+
+        x = Math.cos(baseAngle) * radius;
+        y = Math.sin(baseAngle) * radius;
+
+        rx = x * cosA - y * sinA;
+        ry = x * sinA + y * cosA;
+        vz = (Math.random() - 0.5) * 0.02;
+
+        this.positions[i*3+0] = 0;
+        this.positions[i*3+1] = 0;
+        this.positions[i*3+2] = 0;
+
+        this.velocities.push(new THREE.Vector3(rx * 0.07, ry * 0.07, vz));
+      }
+    }
+
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+
+    this.colors = [];
+    for (let i = 0; i < count; i++) {
+      let color;
+      if (type === "sakura") {
+        color = new THREE.Color().setHSL(0.95 + Math.random()*0.02, 0.9 + Math.random()*0.1, 0.45 + Math.random()*0.1);
+      } else {
+        color = new THREE.Color().setHSL(0.95 + Math.random()*0.02, 0.7 + Math.random()*0.2, 0.55 + Math.random()*0.15);
+      }
+      this.colors.push(color.r, color.g, color.b);
+    }
+    this.geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.colors, 3));
+
+    this.material = new THREE.PointsMaterial({
+      map: glowTexture,
+      size: type === "sakura" ? 0.20 : 0.17,
+      transparent: true,
+      opacity: 1,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true,
+      vertexColors: true
+    });
+
+    this.points = new THREE.Points(this.geometry, this.material);
+    this.points.position.copy(position);
+    scene.add(this.points);
+
+    this.age = 0;
+    this.lifespan = 80;
+  }
+
+  update() {
+    this.age++;
+
+    for (let i = 0; i < this.velocities.length; i++) {
+      const v = this.velocities[i];
+
+      if (this.type === "heart") {
+        v.multiplyScalar(0.80);
+      } else if (this.type === "sakura") {
+        v.multiplyScalar(0.99);
+      }
+
+      v.add(this.gravity);
+
+      this.positions[i*3+0] += v.x;
+      this.positions[i*3+1] += v.y;
+      this.positions[i*3+2] += v.z;
+    }
+
+    this.geometry.attributes.position.needsUpdate = true;
+
+    const t = this.age / this.lifespan;
+    this.material.opacity = Math.pow(1 - t, 1.5);
+  }
+
+  isDead() { return this.age > this.lifespan; }
+
+  dispose() {
+    scene.remove(this.points);
+    this.geometry.dispose();
+    this.material.dispose();
+  }
+}
