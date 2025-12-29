@@ -1,6 +1,6 @@
 // fireworks.js
 import * as THREE from 'https://unpkg.com/three@0.181.0/build/three.module.js';
-import { playSound, fireworkBuffer, fireworkBuffer2, audioReady } from './audio.js';
+import { playSound, fireworkBuffer, fireworkBuffer2 } from './audio.js';
 
 export const fireworks = [];
 export const MAX_FIREWORKS = 24;
@@ -88,13 +88,15 @@ export class FireworkBall {
       }, 160);
     }
 
+    // 寿命で爆発
     if (this.age >= this.lifespan) {
       fireworks.push(new Explosion(this.points.position.clone(), false));
       scene.remove(this.points);
       this.geometry.dispose();
       this.material.dispose();
 
-      audioReady.then(() => playSound(fireworkBuffer2));
+      // 🔥 分割前と同じ：即時再生
+      playSound(fireworkBuffer2);
     }
   }
 
@@ -149,9 +151,8 @@ export class Explosion {
     this.explodedOnce = false;
     this.shouldExplodeTwice = Math.random() < 0.4;
 
-    audioReady.then(() =>
-      playSound(isSecond ? fireworkBuffer : fireworkBuffer2)
-    );
+    // 🔥 分割前と同じ：即時再生
+    playSound(isSecond ? fireworkBuffer : fireworkBuffer2);
   }
 
   update() {
@@ -178,10 +179,12 @@ export class Explosion {
       this.material.size = 0.085;
     }
 
+    // 二段爆発
     if (this.age === 30 && this.shouldExplodeTwice && !this.explodedOnce) {
       fireworks.push(new Explosion(this.points.position.clone(), true));
 
-      audioReady.then(() => playSound(fireworkBuffer));
+      // 🔥 分割前と同じ：即時再生
+      playSound(fireworkBuffer);
 
       this.explodedOnce = true;
     }
@@ -196,7 +199,7 @@ export class Explosion {
   }
 }
 
-// ---------------- ShapeExplosion（追加済み） ----------------
+// ---------------- ShapeExplosion ----------------
 export class ShapeExplosion {
   constructor(position, type = "heart") {
     this.type = type;
