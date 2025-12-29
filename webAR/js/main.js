@@ -1,13 +1,16 @@
 // main.js
 import * as THREE from 'https://unpkg.com/three@0.181.0/build/three.module.js';
 
-import { initAudio } from './audio.js';
+import { initAudio, audioReady } from './audio.js';
 import { initCamera } from './camera.js';
 import { fireworks, initFireworks } from './fireworks.js';
 import { launchMainFireworks, launchBackgroundFireworks } from './launcher.js';
 
-// ---------------- Audio & Camera ----------------
+// ---------------- Audio ----------------
+await audioReady;  // ← これが重要（音声ロード完了まで待つ）
 initAudio();
+
+// ---------------- Camera ----------------
 initCamera();
 
 // ---------------- Three.js setup ----------------
