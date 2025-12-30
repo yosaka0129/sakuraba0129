@@ -6,6 +6,47 @@ import { initCamera } from './camera.js';
 import { fireworks, initFireworks } from './fireworks.js';
 import { launchMainFireworks, launchBackgroundFireworks } from './launcher.js';
 
+// ---------------- 3D Text ----------------
+import { FontLoader } from 'https://unpkg.com/three@0.181.0/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'https://unpkg.com/three@0.181.0/examples/jsm/geometries/TextGeometry.js';
+
+function addBirthdayText(scene) {
+  const loader = new FontLoader();
+
+  loader.load('./fonts/helvetiker_regular.typeface.json', (font) => {
+
+    const geometry = new TextGeometry('お誕生日おめでとう！', {
+      font: font,
+      size: 0.45,
+      height: 0.05,
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 0.01,
+      bevelSize: 0.008,
+      bevelSegments: 3
+    });
+
+    const material = new THREE.MeshPhongMaterial({
+      color: 0xff66cc,
+      emissive: 0x330022,
+      shininess: 80
+    });
+
+    const mesh = new THREE.Mesh(geometry, material);
+
+    mesh.position.set(-2.5, 1.5, -5);
+    mesh.rotation.y = 0.2;
+
+    scene.add(mesh);
+
+    function animateText() {
+      requestAnimationFrame(animateText);
+      mesh.rotation.y += 0.002;
+      mesh.position.y = 1.5 + Math.sin(Date.now() * 0.001) * 0.05;
+    }
+    animateText();
+  });
+}
 // ---------------- Audio ----------------
 await audioReady;  // ← これが重要（音声ロード完了まで待つ）
 initAudio();
@@ -48,6 +89,7 @@ window.addEventListener('resize', () => {
 // ---------------- Fireworks init ----------------
 initFireworks(scene);
 
+addBirthdayText(scene);
 // ---------------- Launchers ----------------
 launchMainFireworks();
 launchBackgroundFireworks();
