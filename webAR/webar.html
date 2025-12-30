@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>AR花火</title>
+
   <style>
     body {
       margin: 0;
@@ -16,13 +17,13 @@
       width: 100vw;
       height: 100vh;
       object-fit: cover;
-      z-index: -1; /* 背景に配置 */
+      z-index: -1;
     }
     #canvas {
       position: fixed;
       top: 0;
       left: 0;
-      z-index: 0; /* 花火を前面に描画 */
+      z-index: 0;
     }
     #enableSound {
       position: absolute;
@@ -37,18 +38,26 @@
       cursor: pointer;
     }
   </style>
+
+  <!-- ★★★ これが “three を解決する importmap” ★★★ -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.181.0/build/three.module.js",
+      "three/examples/jsm/": "https://unpkg.com/three@0.181.0/examples/jsm/"
+    }
+  }
+  </script>
+
 </head>
 <body>
-  <!-- 音声有効化ボタン -->
+
   <button id="enableSound">音を有効にする</button>
-
-  <!-- カメラ映像 -->
   <video id="camera" autoplay muted playsinline></video>
-
-  <!-- Three.js の描画キャンバス -->
   <canvas id="canvas"></canvas>
 
-  <!-- 花火のメインスクリプト -->
+  <!-- ES Modules として main.js を読み込む -->
   <script type="module" src="./js/main.js"></script>
+
 </body>
 </html>
