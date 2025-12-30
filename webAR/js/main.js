@@ -1,14 +1,13 @@
-// main.js
-import * as THREE from 'https://unpkg.com/three@0.181.0/build/three.module.js';
+import * as THREE from 'three';
 
 import { initAudio, audioReady } from './audio.js';
 import { initCamera } from './camera.js';
 import { fireworks, initFireworks } from './fireworks.js';
 import { launchMainFireworks, launchBackgroundFireworks } from './launcher.js';
 
-// ---------------- 3D Text ----------------
-import { FontLoader } from 'https://unpkg.com/three@0.181.0/examples/jsm/loaders/FontLoader.js';
-import { TextGeometry } from 'https://unpkg.com/three@0.181.0/examples/jsm/geometries/TextGeometry.js';
+// 3D Text
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 function addBirthdayText(scene) {
   const loader = new FontLoader();
@@ -47,14 +46,15 @@ function addBirthdayText(scene) {
     animateText();
   });
 }
-// ---------------- Audio ----------------
-await audioReady;  // ← これが重要（音声ロード完了まで待つ）
+
+// Audio
+await audioReady;
 initAudio();
 
-// ---------------- Camera ----------------
+// Camera
 initCamera();
 
-// ---------------- Three.js setup ----------------
+// Three.js setup
 const scene = new THREE.Scene();
 scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 
@@ -86,15 +86,15 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// ---------------- Fireworks init ----------------
+// Fireworks
 initFireworks(scene);
-
 addBirthdayText(scene);
-// ---------------- Launchers ----------------
+
+// Launchers
 launchMainFireworks();
 launchBackgroundFireworks();
 
-// ---------------- Render loop ----------------
+// Render loop
 function animate() {
   requestAnimationFrame(animate);
 
