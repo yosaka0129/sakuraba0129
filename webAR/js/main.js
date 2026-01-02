@@ -17,7 +17,7 @@ function addBirthdayText(scene) {
     const geometry = new TextGeometry('お誕生日おめでとう！', {
       font: font,
       size: 0.45,
-      height: 0.05,
+      height: 0.02,          // ← 奥行きを薄くして伸びを軽減
       curveSegments: 12,
       bevelEnabled: true,
       bevelThickness: 0.01,
@@ -33,17 +33,13 @@ function addBirthdayText(scene) {
 
     const mesh = new THREE.Mesh(geometry, material);
 
-    mesh.position.set(-2.5, 1.5, -5);
+    // ← 近づけてパースを弱くする
+    mesh.position.set(-2.0, 1.5, -2.5);
+
+    // ← 初期角度だけ（アニメーションなし）
     mesh.rotation.y = 0.2;
 
     scene.add(mesh);
-
-    function animateText() {
-      requestAnimationFrame(animateText);
-      mesh.rotation.y += 0.002;
-      mesh.position.y = 1.5 + Math.sin(Date.now() * 0.001) * 0.05;
-    }
-    animateText();
   });
 }
 
