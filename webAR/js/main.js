@@ -11,18 +11,31 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 function addBirthdayText(scene) {
   const loader = new FontLoader();
+  
+  loader.load(
+  './fonts/helvetiker_regular.typeface.json',
+  (font) => {
+    console.log("Font loaded!", font);
+    // ここに TextGeometry の処理
+  },
+  undefined,
+  (err) => {
+    console.error("Font load error:", err);
+  }
+  );
+
 
   loader.load('./fonts/helvetiker_regular.typeface.json', (font) => {
 
-    const geometry = new TextGeometry('お誕生日おめでとう！', {
+    const geometry = new TextGeometry('お誕生日おめでとう', {
       font: font,
       size: 0.45,
-      height: 0.02,          // ← 奥行きを薄くして伸びを軽減
+      height: 0.01,     // ← 奥行きを極薄に
       curveSegments: 12,
       bevelEnabled: true,
-      bevelThickness: 0.01,
-      bevelSize: 0.008,
-      bevelSegments: 3
+      bevelThickness: 0.005,
+      bevelSize: 0.004,
+      bevelSegments: 2
     });
 
     const material = new THREE.MeshPhongMaterial({
@@ -33,11 +46,11 @@ function addBirthdayText(scene) {
 
     const mesh = new THREE.Mesh(geometry, material);
 
-    // ← 近づけてパースを弱くする
-    mesh.position.set(-2.0, 1.5, -2.5);
+    // ← 近づけてパース歪みをほぼゼロに
+    mesh.position.set(-1.5, 1.2, -1.8);
 
-    // ← 初期角度だけ（アニメーションなし）
-    mesh.rotation.y = 0.2;
+    // ← 初期角度だけ
+    mesh.rotation.y = 0.15;
 
     scene.add(mesh);
   });
