@@ -37,9 +37,23 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
+    /* ★★★ 誕生日テキスト ★★★ */
+    #birthdayText {
+      position: fixed;
+      top: 20%;
+      width: 100%;
+      text-align: center;
+      font-size: 36px;
+      font-weight: bold;
+      color: #ff66cc;
+      text-shadow: 0 0 10px #ff99dd, 0 0 20px #ff66cc;
+      z-index: 10;
+      pointer-events: none;
+    }
   </style>
 
-  <!-- ★★★ これが “three を解決する importmap” ★★★ -->
+  <!-- three.js の importmap -->
   <script type="importmap">
   {
     "imports": {
@@ -55,6 +69,9 @@
   <button id="enableSound">音を有効にする</button>
   <video id="camera" autoplay muted playsinline></video>
   <canvas id="canvas"></canvas>
+
+  <!-- ★★★ 誕生日テキスト ★★★ -->
+  <div id="birthdayText">お誕生日おめでとう！</div>
 
   <!-- ES Modules として main.js を読み込む -->
   <script type="module" src="./js/main.js"></script>
