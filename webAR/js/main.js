@@ -5,57 +5,6 @@ import { initCamera } from './camera.js';
 import { fireworks, initFireworks } from './fireworks.js';
 import { launchMainFireworks, launchBackgroundFireworks } from './launcher.js';
 
-// 3D Text
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
-
-function addBirthdayText(scene) {
-  const loader = new FontLoader();
-  
-  loader.load(
-  './fonts/helvetiker_regular.typeface.json',
-  (font) => {
-    console.log("Font loaded!", font);
-    // ここに TextGeometry の処理
-  },
-  undefined,
-  (err) => {
-    console.error("Font load error:", err);
-  }
-  );
-
-
-  loader.load('./fonts/helvetiker_regular.typeface.json', (font) => {
-
-    const geometry = new TextGeometry('お誕生日おめでとう', {
-      font: font,
-      size: 0.45,
-      height: 0.01,     // ← 奥行きを極薄に
-      curveSegments: 12,
-      bevelEnabled: true,
-      bevelThickness: 0.005,
-      bevelSize: 0.004,
-      bevelSegments: 2
-    });
-
-    const material = new THREE.MeshPhongMaterial({
-      color: 0xff66cc,
-      emissive: 0x330022,
-      shininess: 80
-    });
-
-    const mesh = new THREE.Mesh(geometry, material);
-
-    // ← 近づけてパース歪みをほぼゼロに
-    mesh.position.set(-1.5, 1.2, -1.8);
-
-    // ← 初期角度だけ
-    mesh.rotation.y = 0.15;
-
-    scene.add(mesh);
-  });
-}
-
 // Audio
 await audioReady;
 initAudio();
@@ -97,7 +46,6 @@ window.addEventListener('resize', () => {
 
 // Fireworks
 initFireworks(scene);
-addBirthdayText(scene);
 
 // Launchers
 launchMainFireworks();
