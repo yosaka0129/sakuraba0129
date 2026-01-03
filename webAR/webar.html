@@ -38,15 +38,46 @@
       cursor: pointer;
     }
 
-    /* ★★★ 誕生日テキスト ★★★ */
-    #birthdayText {
+    /* ★★★ 上部の日付 ★★★ */
+    #dateText {
       position: fixed;
-      top: 20%;
+      top: 3%;
       width: 100%;
       text-align: center;
-      font-size: 36px;
+      font-size: 20px;
       font-weight: bold;
-      color: #ff66cc;
+      color: white;
+      -webkit-text-stroke: 1px #ff66cc; /* ピンクの縁取り */
+      text-shadow: 0 0 8px #ff99dd, 0 0 15px #ff66cc;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* ★★★ 遥花ちゃん（1行目） ★★★ */
+    #nameText {
+      position: fixed;
+      top: 55%; /* 画面の半分より下 */
+      width: 100%;
+      text-align: center;
+      font-size: 48px;
+      font-weight: bold;
+      color: white;
+      -webkit-text-stroke: 2px #ff66cc; /* ピンクの縁取り */
+      text-shadow: 0 0 10px #ffccf2, 0 0 20px #ff66cc;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* ★★★ お誕生日おめでとう！（2行目） ★★★ */
+    #birthdayText {
+      position: fixed;
+      top: 63%; /* 名前より少し下 */
+      width: 100%;
+      text-align: center;
+      font-size: 42px;
+      font-weight: bold;
+      color: white;
+      -webkit-text-stroke: 2px #ff66cc;
       text-shadow: 0 0 10px #ff99dd, 0 0 20px #ff66cc;
       z-index: 10;
       pointer-events: none;
@@ -70,7 +101,13 @@
   <video id="camera" autoplay muted playsinline></video>
   <canvas id="canvas"></canvas>
 
-  <!-- ★★★ 誕生日テキスト ★★★ -->
+  <!-- ★★★ 日付 ★★★ -->
+  <div id="dateText">2026.01.29</div>
+
+  <!-- ★★★ 遥花ちゃん ★★★ -->
+  <div id="nameText">遥花ちゃん</div>
+
+  <!-- ★★★ お誕生日おめでとう！ ★★★ -->
   <div id="birthdayText">お誕生日おめでとう！</div>
 
   <!-- ES Modules として main.js を読み込む -->
