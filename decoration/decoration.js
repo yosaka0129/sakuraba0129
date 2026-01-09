@@ -92,13 +92,15 @@ canvas.addEventListener("click", e => {
 
   // ---- 新規配置 ----
   if (currentStamp) {
+    if (!currentStamp.complete) return; // 読み込み前なら配置しない
+
     saveHistory();
     placed.push({
       img: currentStamp,
       x,
       y,
-      w: 100,
-      h: 100,
+      w: currentStamp.width,
+      h: currentStamp.height,
       scale: 1,
       angle: 0
     });
@@ -205,15 +207,15 @@ function loadCategory(name) {
 
         img.onclick = () => {
           const imageObj = new Image();
+          imageObj.onload = () => {
+            if (name === "frames") {
+              currentFrame = imageObj;
+            } else {
+              currentStamp = imageObj;
+            }
+            console.log("選択された素材:", imageObj.src);
+          };
           imageObj.src = img.src;
-
-          if (name === "frames") {
-            currentFrame = imageObj;
-          } else {
-            currentStamp = imageObj;
-          }
-
-          console.log("選択された素材:", imageObj.src);
         };
 
         box.appendChild(img);
