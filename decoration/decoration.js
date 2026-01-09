@@ -42,6 +42,18 @@ canvas.addEventListener("touchmove", e => {
 }, { passive: false });
 
 // ===============================
+// 当たり判定用オフスクリーンCanvas作成
+// ===============================
+function createHitCanvas(imageObj) {
+  const off = document.createElement("canvas");
+  off.width = imageObj.width;
+  off.height = imageObj.height;
+  const offCtx = off.getContext("2d");
+  offCtx.drawImage(imageObj, 0, 0);
+  return off;
+}
+
+// ===============================
 // 描画処理
 // ===============================
 function draw() {
@@ -93,24 +105,34 @@ function draw() {
 }
 
 // ===============================
-// 素材を置く・選択する
+// 素材選択（透明部分除去のピクセルパーフェクト判定）
 // ===============================
 canvas.addEventListener("click", e => {
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
 
-  // ---- 既存素材の選択判定（矩形判定）----
   selected = placed.find(obj => {
     const dx = x - obj.x;
     const dy = y - obj.y;
-    return Math.abs(dx) < obj.w / 2 && Math.abs(dy) < obj.h / 2;
+
+    // 回転を逆回転してローカル座標へ
+    const cos = Math.cos(-obj.angle);
+    const sin = Math.sin(-obj.angle);
+
+    const localX = (dx * cos - dy * sin) / obj.scale + obj.w / 2;
+    const localY = (dx * sin + dy * cos) / obj.scale + obj.h / 2;
+
+    if (localX < 0 || localX >= obj.w || localY < 0 || localY >= obj.h) return false;
+
+    const pixel = obj.hitCanvas
+      .getContext("2d")
+      .getImageData(localX, localY, 1, 1).data;
+
+    return pixel[3] > 0; // α値 > 0 のときだけ選択
   });
 
-  if (selected) {
-    draw();
-    return;
-  }
+  draw();
 });
 
 // ===============================
@@ -118,8 +140,19 @@ canvas.addEventListener("click", e => {
 // ===============================
 let dragging = false;
 
-canvas.addEventListener("mousedown", () => {
-  if (selected) dragging = true;
+canvas.addEventListener("mousedown", e => {
+  if (!selected) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  const dx = x - selected.x;
+  const dy = y - selected.y;
+
+  if (Math.abs(dx) < selected.w / 2 && Math.abs(dy) < selected.h / 2) {
+    dragging = true;
+  }
 });
 
 canvas.addEventListener("mousemove", e => {
@@ -152,15 +185,8 @@ canvas.addEventListener("touchmove", e => {
   const dist = Math.sqrt(dx * dx + dy * dy);
   const angle = Math.atan2(dy, dx);
 
-  // 拡大縮小
-  if (lastDist !== 0) {
-    selected.scale *= dist / lastDist;
-  }
-
-  // 回転
-  if (lastAngle !== 0) {
-    selected.angle += angle - lastAngle;
-  }
+  if (lastDist !== 0) selected.scale *= dist / lastDist;
+  if (lastAngle !== 0) selected.angle += angle - lastAngle;
 
   lastDist = dist;
   lastAngle = angle;
@@ -174,7 +200,7 @@ canvas.addEventListener("touchend", () => {
 });
 
 // ===============================
-// 戻る（Undo）
+// Undo
 // ===============================
 document.getElementById("undoBtn").onclick = () => {
   if (history.length > 0) {
@@ -185,7 +211,7 @@ document.getElementById("undoBtn").onclick = () => {
 };
 
 // ===============================
-// 削除（Delete）
+// Delete
 // ===============================
 document.getElementById("deleteBtn").onclick = () => {
   if (selected) {
@@ -197,7 +223,7 @@ document.getElementById("deleteBtn").onclick = () => {
 };
 
 // ===============================
-// 素材をタップしたら即キャンバス中央に配置
+// 素材タップで即キャンバス中央に配置
 // ===============================
 function placeStamp(imageObj, name) {
   if (name === "frames") {
@@ -219,7 +245,8 @@ function placeStamp(imageObj, name) {
     w: imageObj.width,
     h: imageObj.height,
     scale: 1,
-    angle: 0
+    angle: 0,
+    hitCanvas: createHitCanvas(imageObj) // ← 透明判定用
   });
 
   selected = placed[placed.length - 1];
