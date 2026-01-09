@@ -204,12 +204,16 @@ function loadCategory(name) {
         img.src = `assets/${name}/${file}`;
 
         img.onclick = () => {
+          const imageObj = new Image();
+          imageObj.src = img.src;
+
           if (name === "frames") {
-            currentFrame = img;
+            currentFrame = imageObj;
           } else {
-            currentStamp = img;
+            currentStamp = imageObj;
           }
-          draw();
+
+          console.log("選択された素材:", imageObj.src);
         };
 
         box.appendChild(img);
