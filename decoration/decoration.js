@@ -4,7 +4,6 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// レイアウトは CSS で管理するので、JS 側は固定比率だけ意識
 canvas.width = window.innerWidth * 0.9;
 canvas.height = window.innerHeight * 0.6;
 
@@ -18,28 +17,36 @@ photo.onload = () => draw();
 // ===============================
 // 素材管理
 // ===============================
-let placed = [];      // 配置された素材
+let placed = [];      // スタンプ・フレーズのみ
 let selected = null;  // 選択中の素材
-let currentStamp = null;
-let currentFrame = null;
+let currentFrame = null; // フレームは 1 つだけ
 
 // ===============================
 // Undo 用
 // ===============================
 let history = [];
+
 function saveHistory() {
-  history.push(JSON.stringify(placed));
+  const snapshot = placed.map(o => ({
+    src: o.src,
+    x: o.x,
+    y: o.y,
+    w: o.w,
+    h: o.h,
+    scale: o.scale,
+    angle: o.angle
+  }));
+  history.push(JSON.stringify(snapshot));
 }
 
 // ===============================
-// 当たり判定用オフスクリーンCanvas作成
+// 当たり判定用オフスクリーンCanvas
 // ===============================
 function createHitCanvas(imageObj) {
   const off = document.createElement("canvas");
   off.width = imageObj.width;
   off.height = imageObj.height;
-  const offCtx = off.getContext("2d");
-  offCtx.drawImage(imageObj, 0, 0);
+  off.getContext("2d").drawImage(imageObj, 0, 0);
   return off;
 }
 
@@ -50,16 +57,14 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // ---- 写真 ----
-  if (photo && photo.complete) {
+  if (photo.complete) {
     const scale = Math.min(canvas.width / photo.width, canvas.height / photo.height);
     const w = photo.width * scale;
     const h = photo.height * scale;
-    const x = (canvas.width - w) / 2;
-    const y = (canvas.height - h) / 2;
-    ctx.drawImage(photo, x, y, w, h);
+    ctx.drawImage(photo, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
   }
 
-  // ---- 素材 ----
+  // ---- スタンプ・フレーズ ----
   placed.forEach(obj => {
     ctx.save();
     ctx.translate(obj.x, obj.y);
@@ -67,19 +72,15 @@ function draw() {
     ctx.scale(obj.scale, obj.scale);
     ctx.drawImage(obj.img, -obj.w / 2, -obj.h / 2, obj.w, obj.h);
 
-    // ---- 選択中の強調表示 ----
     if (obj === selected) {
-      // 白い太枠
       ctx.strokeStyle = "white";
       ctx.lineWidth = 6;
       ctx.strokeRect(-obj.w / 2, -obj.h / 2, obj.w, obj.h);
 
-      // 赤い細枠
       ctx.strokeStyle = "red";
       ctx.lineWidth = 3;
       ctx.strokeRect(-obj.w / 2, -obj.h / 2, obj.w, obj.h);
 
-      // 光る影（glow）
       ctx.shadowColor = "rgba(255,0,0,0.7)";
       ctx.shadowBlur = 20;
       ctx.strokeRect(-obj.w / 2, -obj.h / 2, obj.w, obj.h);
@@ -88,14 +89,104 @@ function draw() {
     ctx.restore();
   });
 
-  // ---- フレーム ----
-  if (currentFrame && currentFrame.complete) {
+  // ---- フレーム（最前面） ----
+  if (currentFrame) {
     ctx.drawImage(currentFrame, 0, 0, canvas.width, canvas.height);
   }
 }
 
 // ===============================
-// クリックでの素材選択（透明部分除去）
+// フレーム処理（1つだけ）
+// ===============================
+function loadFrames() {
+  fetch("assets/frames/list.json")
+    .then(res => res.json())
+    .then(files => {
+      const box = document.getElementById("frameList");
+      box.innerHTML = "";
+
+      files.forEach(file => {
+        const img = document.createElement("img");
+        img.src = `assets/frames/${file}`;
+        img.onclick = () => setFrame(img.src);
+        box.appendChild(img);
+      });
+    });
+}
+
+function setFrame(src) {
+  const img = new Image();
+  img.src = src;
+  img.onload = () => {
+    currentFrame = img;
+    draw();
+  };
+}
+
+document.getElementById("noFrameBtn").onclick = () => {
+  currentFrame = null;
+  draw();
+};
+
+// ===============================
+// 素材配置（スタンプ・フレーズ）
+// ===============================
+function placeStamp(imageObj) {
+  saveHistory();
+
+  const obj = {
+    img: imageObj,
+    src: imageObj.src,
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    w: imageObj.width,
+    h: imageObj.height,
+    scale: 1,
+    angle: 0,
+    hitCanvas: createHitCanvas(imageObj)
+  };
+
+  placed.push(obj);
+  selected = obj;
+  draw();
+}
+
+// ===============================
+// 素材一覧読み込み
+// ===============================
+function loadCategory(name) {
+  fetch(`assets/${name}/list.json`)
+    .then(res => res.json())
+    .then(files => {
+      const box = document.getElementById(name);
+      box.innerHTML = "";
+
+      files.forEach(file => {
+        const img = document.createElement("img");
+        img.src = `assets/${name}/${file}`;
+
+        img.onclick = () => {
+          const imageObj = new Image();
+          imageObj.src = img.src;
+          imageObj.onload = () => placeStamp(imageObj);
+        };
+
+        box.appendChild(img);
+      });
+    });
+}
+
+// ===============================
+// カテゴリ切り替え
+// ===============================
+function showCategory(name) {
+  document.querySelectorAll(".category").forEach(c => c.style.display = "none");
+  document.getElementById(name).style.display = "block";
+}
+window.showCategory = showCategory;
+
+// ===============================
+// 透明部分除去の選択処理
 // ===============================
 canvas.addEventListener("click", e => {
   const rect = canvas.getBoundingClientRect();
@@ -106,7 +197,6 @@ canvas.addEventListener("click", e => {
     const dx = x - obj.x;
     const dy = y - obj.y;
 
-    // 回転を逆回転してローカル座標へ
     const cos = Math.cos(-obj.angle);
     const sin = Math.sin(-obj.angle);
 
@@ -115,18 +205,16 @@ canvas.addEventListener("click", e => {
 
     if (localX < 0 || localX >= obj.w || localY < 0 || localY >= obj.h) return false;
 
-    const pixel = obj.hitCanvas
-      .getContext("2d")
-      .getImageData(localX, localY, 1, 1).data;
+    const pixel = obj.hitCanvas.getContext("2d").getImageData(localX, localY, 1, 1).data;
 
-    return pixel[3] > 0; // α値 > 0 のときだけ選択
+    return pixel[3] > 0;
   });
 
   draw();
 });
 
 // ===============================
-// ドラッグ移動（マウス）
+// マウスドラッグ移動
 // ===============================
 let dragging = false;
 
@@ -155,16 +243,14 @@ canvas.addEventListener("mousemove", e => {
   draw();
 });
 
-canvas.addEventListener("mouseup", () => {
-  dragging = false;
-});
+canvas.addEventListener("mouseup", () => dragging = false);
 
 // ===============================
-// スマホ用：1本指ドラッグで位置移動
+// スマホ：1本指ドラッグ移動
 // ===============================
 canvas.addEventListener("touchstart", e => {
   if (!selected) return;
-  if (e.touches.length !== 1) return; // 1本指のみ
+  if (e.touches.length !== 1) return;
 
   const t = e.touches[0];
   const rect = canvas.getBoundingClientRect();
@@ -184,7 +270,6 @@ canvas.addEventListener("touchstart", e => {
 canvas.addEventListener("touchmove", e => {
   if (!selected) return;
 
-  // 1本指 → 位置移動
   if (e.touches.length === 1 && dragging) {
     const t = e.touches[0];
     const rect = canvas.getBoundingClientRect();
@@ -196,12 +281,10 @@ canvas.addEventListener("touchmove", e => {
   }
 }, { passive: false });
 
-canvas.addEventListener("touchend", () => {
-  dragging = false;
-});
+canvas.addEventListener("touchend", () => dragging = false);
 
 // ===============================
-// ピンチ拡大・回転（スマホ・2本指）
+// スマホ：2本指ピンチ拡大・回転
 // ===============================
 let lastDist = 0;
 let lastAngle = 0;
@@ -234,30 +317,54 @@ canvas.addEventListener("touchend", () => {
 });
 
 // ===============================
+// 削除
+// ===============================
+document.getElementById("deleteBtn").onclick = () => {
+  if (!selected) return;
+  saveHistory();
+  placed = placed.filter(o => o !== selected);
+  selected = null;
+  draw();
+};
+
+// ===============================
 // Undo
 // ===============================
 document.getElementById("undoBtn").onclick = () => {
-  if (history.length > 0) {
-    placed = JSON.parse(history.pop());
-    selected = null;
-    draw();
-  }
+  if (history.length === 0) return;
+
+  const snapshot = JSON.parse(history.pop());
+
+  placed = snapshot.map(data => {
+    const img = new Image();
+    img.src = data.src;
+
+    const obj = {
+      img,
+      src: data.src,
+      x: data.x,
+      y: data.y,
+      w: data.w,
+      h: data.h,
+      scale: data.scale,
+      angle: data.angle,
+      hitCanvas: null
+    };
+
+    img.onload = () => {
+      obj.hitCanvas = createHitCanvas(img);
+      draw();
+    };
+
+    return obj;
+  });
+
+  selected = null;
+  draw();
 };
 
 // ===============================
-// Delete
-// ===============================
-document.getElementById("deleteBtn").onclick = () => {
-  if (selected) {
-    saveHistory();
-    placed = placed.filter(obj => obj !== selected);
-    selected = null;
-    draw();
-  }
-};
-
-// ===============================
-// 保存（簡易版：画像としてダウンロード）
+// 保存
 // ===============================
 document.getElementById("saveBtn").onclick = () => {
   const link = document.createElement("a");
@@ -267,81 +374,8 @@ document.getElementById("saveBtn").onclick = () => {
 };
 
 // ===============================
-// 素材タップで即キャンバス中央に配置
-// ===============================
-function placeStamp(imageObj, name) {
-  if (name === "frames") {
-    currentFrame = imageObj;
-    draw();
-    return;
-  }
-
-  currentStamp = imageObj;
-
-  const x = canvas.width / 2;
-  const y = canvas.height / 2;
-
-  saveHistory();
-  placed.push({
-    img: imageObj,
-    x,
-    y,
-    w: imageObj.width,
-    h: imageObj.height,
-    scale: 1,
-    angle: 0,
-    hitCanvas: createHitCanvas(imageObj) // ← 透明判定用
-  });
-
-  selected = placed[placed.length - 1];
-  draw();
-}
-
-// ===============================
-// JSON から素材一覧を読み込む
-// ===============================
-function loadCategory(name) {
-  fetch(`assets/${name}/list.json`)
-    .then(res => res.json())
-    .then(files => {
-      const box = document.getElementById(name);
-      box.innerHTML = "";
-
-      files.forEach(file => {
-        const img = document.createElement("img");
-        img.src = `assets/${name}/${file}`;
-
-        img.onclick = () => {
-          const imageObj = new Image();
-          imageObj.src = img.src;
-
-          if (imageObj.complete) {
-            placeStamp(imageObj, name);
-          } else {
-            imageObj.onload = () => placeStamp(imageObj, name);
-          }
-        };
-
-        box.appendChild(img);
-      });
-    })
-    .catch(err => console.error("JSON 読み込みエラー:", err));
-}
-
-// ===============================
-// カテゴリ切り替え
-// ===============================
-function showCategory(name) {
-  document.querySelectorAll(".category").forEach(c => {
-    c.style.display = "none";
-  });
-  const target = document.getElementById(name);
-  if (target) target.style.display = "block";
-}
-window.showCategory = showCategory;
-
-// ===============================
 // 初期化
 // ===============================
-["frames", "stamps", "phrases"].forEach(loadCategory);
+["stamps", "phrases"].forEach(loadCategory);
+loadFrames();
 showCategory("stamps");
