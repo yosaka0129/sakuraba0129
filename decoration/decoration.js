@@ -17,7 +17,7 @@ if (canvas) {
 
   // 描画処理
   function draw() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // 写真をキャンバス中央にフィットさせて描画
     if (photo) {
@@ -33,19 +33,21 @@ if (canvas) {
     placedStamps.forEach(s => {
       ctx.save();
       ctx.translate(s.x, s.y);
-      ctx.rotate(s.angle * Math.PI/180);
-      ctx.drawImage(s.img, -s.size/2, -s.size/2, s.size, s.size);
+      ctx.rotate(s.angle * Math.PI / 180);
+      ctx.drawImage(s.img, -s.size / 2, -s.size / 2, s.size, s.size);
+
+      // 選択中のスタンプに赤枠
       if (s === selectedStamp) {
         ctx.strokeStyle = "red";
         ctx.lineWidth = 3;
-        ctx.strokeRect(-s.size/2, -s.size/2, s.size, s.size);
+        ctx.strokeRect(-s.size / 2, -s.size / 2, s.size, s.size);
       }
       ctx.restore();
     });
 
     // フレームを最上層に描画
     if (currentFrame) {
-      ctx.drawImage(currentFrame,0,0,canvas.width,canvas.height);
+      ctx.drawImage(currentFrame, 0, 0, canvas.width, canvas.height);
     }
   }
 
@@ -54,12 +56,16 @@ if (canvas) {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+
+    // 既存スタンプの選択判定
     selectedStamp = placedStamps.find(s =>
-      x >= s.x - s.size/2 && x <= s.x + s.size/2 &&
-      y >= s.y - s.size/2 && y <= s.y + s.size/2
+      x >= s.x - s.size / 2 && x <= s.x + s.size / 2 &&
+      y >= s.y - s.size / 2 && y <= s.y + s.size / 2
     );
+
+    // 新規スタンプ配置
     if (!selectedStamp && currentStamp) {
-      placedStamps.push({img: currentStamp, x, y, size: 80, angle: 0});
+      placedStamps.push({ img: currentStamp, x, y, size: 80, angle: 0 });
       draw();
     }
   };
@@ -117,6 +123,6 @@ if (canvas) {
   }
 
   // 初期化
-  ["frames","stamps","phrases"].forEach(loadCategory);
+  ["frames", "stamps", "phrases"].forEach(loadCategory);
   showCategory("stamps");
 }
