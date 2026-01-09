@@ -122,6 +122,9 @@ if (canvas) {
     if (target) target.style.display = 'block';
   }
 
+  // ← HTML から呼べるように公開（これが重要）
+  window.showCategory = showCategory;
+
   // 初期化
   ["frames", "stamps", "phrases"].forEach(loadCategory);
   showCategory("stamps");
