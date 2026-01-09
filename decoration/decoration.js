@@ -15,11 +15,16 @@ if (canvas) {
   let currentStamp = null;
   let currentFrame = null;
 
+  // ★ 各フォルダに1枚だけ画像が入っている前提
+  const stampFiles = ["stamp1.png"];
+  const frameFiles = ["frame1.png"];
+  const phraseFiles = ["phrase1.png"];
+
   // 描画処理
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 写真をキャンバス中央にフィットさせて描画
+    // 写真をキャンバス中央にフィット
     if (photo) {
       const scale = Math.min(canvas.width / photo.width, canvas.height / photo.height);
       const drawWidth = photo.width * scale;
@@ -29,14 +34,13 @@ if (canvas) {
       ctx.drawImage(photo, x, y, drawWidth, drawHeight);
     }
 
-    // スタンプを描画
+    // スタンプ描画
     placedStamps.forEach(s => {
       ctx.save();
       ctx.translate(s.x, s.y);
       ctx.rotate(s.angle * Math.PI / 180);
       ctx.drawImage(s.img, -s.size / 2, -s.size / 2, s.size, s.size);
 
-      // 選択中のスタンプに赤枠
       if (s === selectedStamp) {
         ctx.strokeStyle = "red";
         ctx.lineWidth = 3;
@@ -45,38 +49,36 @@ if (canvas) {
       ctx.restore();
     });
 
-    // フレームを最上層に描画
+    // フレーム描画
     if (currentFrame) {
       ctx.drawImage(currentFrame, 0, 0, canvas.width, canvas.height);
     }
   }
 
-  // キャンバスクリックでスタンプ選択 or 新規配置
+  // キャンバスクリック
   canvas.onclick = e => {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // 既存スタンプの選択判定
     selectedStamp = placedStamps.find(s =>
       x >= s.x - s.size / 2 && x <= s.x + s.size / 2 &&
       y >= s.y - s.size / 2 && y <= s.y + s.size / 2
     );
 
-    // 新規スタンプ配置
     if (!selectedStamp && currentStamp) {
       placedStamps.push({ img: currentStamp, x, y, size: 80, angle: 0 });
       draw();
     }
   };
 
-  // 戻る（最後のスタンプ削除）
+  // 戻る
   document.getElementById('undoBtn').onclick = () => {
     placedStamps.pop();
     draw();
   };
 
-  // 選択スタンプ削除
+  // 削除
   document.getElementById('deleteBtn').onclick = () => {
     if (selectedStamp) {
       placedStamps = placedStamps.filter(s => s !== selectedStamp);
@@ -85,7 +87,7 @@ if (canvas) {
     }
   };
 
-  // 保存（完成画像をPNGとしてダウンロード）
+  // 保存
   document.getElementById('saveBtn').onclick = () => {
     const link = document.createElement('a');
     link.download = 'decorated.png';
@@ -93,24 +95,21 @@ if (canvas) {
     link.click();
   };
 
-  // カテゴリ読み込み（frames, stamps, phrases）
-  function loadCategory(name) {
-    fetch(`assets/${name}/list.json`)
-      .then(res => res.json())
-      .then(files => {
-        const container = document.getElementById(name);
-        container.innerHTML = "";
-        files.forEach(file => {
-          const img = document.createElement("img");
-          img.src = `assets/${name}/${file}`;
-          img.onclick = () => {
-            if (name === "frames") currentFrame = img;
-            else currentStamp = img;
-            draw();
-          };
-          container.appendChild(img);
-        });
-      });
+  // ★ json を使わない素材読み込み
+  function loadCategory(name, files) {
+    const container = document.getElementById(name);
+    container.innerHTML = "";
+
+    files.forEach(file => {
+      const img = document.createElement("img");
+      img.src = `assets/${name}/${file}`;
+      img.onclick = () => {
+        if (name === "frames") currentFrame = img;
+        else currentStamp = img;
+        draw();
+      };
+      container.appendChild(img);
+    });
   }
 
   // カテゴリ切り替え
@@ -118,14 +117,14 @@ if (canvas) {
     document.querySelectorAll('.category').forEach(div => {
       div.style.display = 'none';
     });
-    const target = document.getElementById(name);
-    if (target) target.style.display = 'block';
+    document.getElementById(name).style.display = 'flex';
   }
-
-  // ← HTML から呼べるように公開（これが重要）
   window.showCategory = showCategory;
 
   // 初期化
-  ["frames", "stamps", "phrases"].forEach(loadCategory);
+  loadCategory("stamps", stampFiles);
+  loadCategory("frames", frameFiles);
+  loadCategory("phrases", phraseFiles);
+
   showCategory("stamps");
 }
