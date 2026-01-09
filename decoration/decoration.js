@@ -15,11 +15,6 @@ if (canvas) {
   let currentStamp = null;
   let currentFrame = null;
 
-  // ★ 各フォルダに1枚だけ画像が入っている前提
-  const stampFiles = ["stamp1.png"];
-  const frameFiles = ["frame1.png"];
-  const phraseFiles = ["phrase1.png"];
-
   // 描画処理
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -95,21 +90,26 @@ if (canvas) {
     link.click();
   };
 
-  // ★ json を使わない素材読み込み
-  function loadCategory(name, files) {
-    const container = document.getElementById(name);
-    container.innerHTML = "";
+  // ★ json を使った素材読み込み
+  function loadCategory(name) {
+    fetch(`assets/${name}/list.json`)
+      .then(res => res.json())
+      .then(files => {
+        const container = document.getElementById(name);
+        container.innerHTML = "";
 
-    files.forEach(file => {
-      const img = document.createElement("img");
-      img.src = `assets/${name}/${file}`;
-      img.onclick = () => {
-        if (name === "frames") currentFrame = img;
-        else currentStamp = img;
-        draw();
-      };
-      container.appendChild(img);
-    });
+        files.forEach(file => {
+          const img = document.createElement("img");
+          img.src = `assets/${name}/${file}`;
+          img.onclick = () => {
+            if (name === "frames") currentFrame = img;
+            else currentStamp = img;
+            draw();
+          };
+          container.appendChild(img);
+        });
+      })
+      .catch(err => console.error("JSON 読み込みエラー:", err));
   }
 
   // カテゴリ切り替え
@@ -122,9 +122,6 @@ if (canvas) {
   window.showCategory = showCategory;
 
   // 初期化
-  loadCategory("stamps", stampFiles);
-  loadCategory("frames", frameFiles);
-  loadCategory("phrases", phraseFiles);
-
+  ["frames", "stamps", "phrases"].forEach(loadCategory);
   showCategory("stamps");
 }

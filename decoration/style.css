@@ -3,6 +3,8 @@ body {
   text-align: center;
   font-family: sans-serif;
 }
+
+/* ボタン */
 button, #upload {
   margin: 10px;
   padding: 12px 20px;
@@ -11,25 +13,39 @@ button, #upload {
   border: none;
   background-color: #ffb6c1;
   color: white;
+  cursor: pointer;
 }
+
+/* キャンバス */
 #canvas {
   border: 2px solid #ff69b4;
   margin: 10px auto;
   display: block;
   max-width: 100%;
 }
+
+/* カテゴリ（素材一覧） */
 .category {
   margin-top: 15px;
-  overflow-x: auto;
+  padding: 10px;
+  display: none;              /* ボタンで切り替え */
+  overflow-x: auto;           /* 横スクロール */
   white-space: nowrap;
-  display: none;
+  background: #ffeef4;        /* 優しいピンク背景 */
+  border-top: 2px solid #ff99bb;
+  height: 140px;              /* 一覧の高さを固定 */
+  box-sizing: border-box;
 }
+
+/* 素材画像 */
 .category img {
-  width: 80px;
-  height: 80px;
+  width: 110px;               /* 少し大きくして押しやすく */
+  height: 110px;
   margin: 5px;
   border: 2px solid #ff69b4;
-  border-radius: 10px;
+  border-radius: 12px;
   background-color: white;
   cursor: pointer;
+  object-fit: contain;        /* 画像が潰れない */
+  padding: 5px;
 }
