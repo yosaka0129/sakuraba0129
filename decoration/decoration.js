@@ -16,9 +16,9 @@ if (canvas) {
   let currentFrame = null;
 
   // ★ 各フォルダに1枚だけ画像が入っている前提
-  const stampFiles = ["stamps1.png"];
-  const frameFiles = ["frames1.png"];
-  const phraseFiles = ["phrases1.png"];
+  const stampFiles = ["stamp1.png"];
+  const frameFiles = ["frame1.png"];
+  const phraseFiles = ["phrase1.png"];
 
   // 描画処理
   function draw() {
