@@ -5,24 +5,41 @@
   <title>デコレーション</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <h2>デコレーション画面</h2>
+  <div id="app">
 
-  <canvas id="canvas"></canvas>
+    <!-- タイトル -->
+    <header id="header">
+      <h2>デコレーション画面</h2>
+    </header>
 
-  <button id="undoBtn">戻る</button>
-  <button id="deleteBtn">消去</button>
-  <button id="saveBtn">保存</button>
+    <!-- キャンバス領域（画面中央に固定） -->
+    <main id="canvasArea">
+      <canvas id="canvas"></canvas>
 
-  <div id="tabs">
-    <button onclick="showCategory('frames')">フレーム</button>
-    <button onclick="showCategory('stamps')">スタンプ</button>
-    <button onclick="showCategory('phrases')">フレーズ</button>
+      <div id="actionButtons">
+        <button id="undoBtn">戻る</button>
+        <button id="deleteBtn">消去</button>
+        <button id="saveBtn">保存</button>
+      </div>
+    </main>
+
+    <!-- タブボタン -->
+    <nav id="tabs">
+      <button onclick="showCategory('frames')">フレーム</button>
+      <button onclick="showCategory('stamps')">スタンプ</button>
+      <button onclick="showCategory('phrases')">フレーズ</button>
+    </nav>
+
+    <!-- 素材一覧（下部固定・横スクロール） -->
+    <section id="categories">
+      <div id="frames" class="category"></div>
+      <div id="stamps" class="category"></div>
+      <div id="phrases" class="category"></div>
+    </section>
+
   </div>
-
-  <div id="frames" class="category"></div>
-  <div id="stamps" class="category"></div>
-  <div id="phrases" class="category"></div>
 
   <script src="decoration.js"></script>
 </body>

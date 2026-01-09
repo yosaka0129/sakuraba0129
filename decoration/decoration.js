@@ -4,6 +4,7 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+// レイアウトは CSS で管理するので、JS 側は固定比率だけ意識
 canvas.width = window.innerWidth * 0.9;
 canvas.height = window.innerHeight * 0.6;
 
@@ -31,17 +32,6 @@ function saveHistory() {
 }
 
 // ===============================
-// スマホでのピンチ時に画面が動かないようにする
-// ===============================
-canvas.addEventListener("touchstart", e => {
-  if (e.touches.length >= 2) e.preventDefault();
-}, { passive: false });
-
-canvas.addEventListener("touchmove", e => {
-  if (e.touches.length >= 2) e.preventDefault();
-}, { passive: false });
-
-// ===============================
 // 当たり判定用オフスクリーンCanvas作成
 // ===============================
 function createHitCanvas(imageObj) {
@@ -60,7 +50,7 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // ---- 写真 ----
-  if (photo) {
+  if (photo && photo.complete) {
     const scale = Math.min(canvas.width / photo.width, canvas.height / photo.height);
     const w = photo.width * scale;
     const h = photo.height * scale;
@@ -99,13 +89,13 @@ function draw() {
   });
 
   // ---- フレーム ----
-  if (currentFrame) {
+  if (currentFrame && currentFrame.complete) {
     ctx.drawImage(currentFrame, 0, 0, canvas.width, canvas.height);
   }
 }
 
 // ===============================
-// 素材選択（透明部分除去のピクセルパーフェクト判定）
+// クリックでの素材選択（透明部分除去）
 // ===============================
 canvas.addEventListener("click", e => {
   const rect = canvas.getBoundingClientRect();
@@ -136,7 +126,7 @@ canvas.addEventListener("click", e => {
 });
 
 // ===============================
-// ドラッグ移動
+// ドラッグ移動（マウス）
 // ===============================
 let dragging = false;
 
@@ -165,10 +155,53 @@ canvas.addEventListener("mousemove", e => {
   draw();
 });
 
-canvas.addEventListener("mouseup", () => dragging = false);
+canvas.addEventListener("mouseup", () => {
+  dragging = false;
+});
 
 // ===============================
-// ピンチ拡大・回転（スマホ操作）
+// スマホ用：1本指ドラッグで位置移動
+// ===============================
+canvas.addEventListener("touchstart", e => {
+  if (!selected) return;
+  if (e.touches.length !== 1) return; // 1本指のみ
+
+  const t = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const x = t.clientX - rect.left;
+  const y = t.clientY - rect.top;
+
+  const dx = x - selected.x;
+  const dy = y - selected.y;
+
+  if (Math.abs(dx) < selected.w / 2 && Math.abs(dy) < selected.h / 2) {
+    dragging = true;
+  }
+
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener("touchmove", e => {
+  if (!selected) return;
+
+  // 1本指 → 位置移動
+  if (e.touches.length === 1 && dragging) {
+    const t = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    selected.x = t.clientX - rect.left;
+    selected.y = t.clientY - rect.top;
+    draw();
+    e.preventDefault();
+    return;
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => {
+  dragging = false;
+});
+
+// ===============================
+// ピンチ拡大・回転（スマホ・2本指）
 // ===============================
 let lastDist = 0;
 let lastAngle = 0;
@@ -192,7 +225,8 @@ canvas.addEventListener("touchmove", e => {
   lastAngle = angle;
 
   draw();
-});
+  e.preventDefault();
+}, { passive: false });
 
 canvas.addEventListener("touchend", () => {
   lastDist = 0;
@@ -220,6 +254,16 @@ document.getElementById("deleteBtn").onclick = () => {
     selected = null;
     draw();
   }
+};
+
+// ===============================
+// 保存（簡易版：画像としてダウンロード）
+// ===============================
+document.getElementById("saveBtn").onclick = () => {
+  const link = document.createElement("a");
+  link.href = canvas.toDataURL("image/png");
+  link.download = "decoration.png";
+  link.click();
 };
 
 // ===============================
@@ -291,7 +335,8 @@ function showCategory(name) {
   document.querySelectorAll(".category").forEach(c => {
     c.style.display = "none";
   });
-  document.getElementById(name).style.display = "flex";
+  const target = document.getElementById(name);
+  if (target) target.style.display = "block";
 }
 window.showCategory = showCategory;
 

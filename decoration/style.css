@@ -1,51 +1,116 @@
-body {
-  background-color: #ffe4e1;
+/* 全体のスクロールを禁止して、画面サイズにフィット */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* ← 縦スクロール禁止 */
+  height: 100%;
+  touch-action: none; /* ← ブラウザ側のパン/ズームを無効化 */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* アプリ全体のレイアウトコンテナ */
+#app {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ヘッダー（タイトル） */
+#header {
   text-align: center;
-  font-family: sans-serif;
+  padding: 8px 0;
+  background: #f0f0f0;
+  flex-shrink: 0;
 }
 
-/* ボタン */
-button, #upload {
-  margin: 10px;
-  padding: 12px 20px;
+#header h2 {
+  margin: 0;
   font-size: 18px;
-  border-radius: 8px;
-  border: none;
-  background-color: #ffb6c1;
-  color: white;
-  cursor: pointer;
 }
 
-/* キャンバス */
+/* キャンバス領域（中央） */
+#canvasArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+/* キャンバス本体 */
 #canvas {
-  border: 2px solid #ff69b4;
-  margin: 10px auto;
-  display: block;
+  width: 100%;
   max-width: 100%;
+  max-height: 65vh;
+  background: #ddd;
+  touch-action: none; /* ← ここだけはブラウザのジェスチャ完全オフ */
+  display: block;
 }
 
-/* カテゴリ（素材一覧） */
+/* 戻る / 消去 / 保存ボタン */
+#actionButtons {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+}
+
+#actionButtons button {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+/* タブ部分（フレーム / スタンプ / フレーズ） */
+#tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 6px;
+  background: #fafafa;
+  flex-shrink: 0;
+}
+
+#tabs button {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+/* 素材一覧コンテナ（下部固定） */
+#categories {
+  height: 22vh;
+  background: #fff;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-top: 1px solid #ddd;
+}
+
+/* 各カテゴリの中身：横スクロールのみ許可 */
 .category {
-  margin-top: 15px;
-  padding: 10px;
-  display: none;              /* ボタンで切り替え */
-  overflow-x: auto;           /* 横スクロール */
+  display: none;           /* JS で表示切り替え */
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
   white-space: nowrap;
-  background: #ffeef4;        /* 優しいピンク背景 */
-  border-top: 2px solid #ff99bb;
-  height: 140px;              /* 一覧の高さを固定 */
+  padding: 8px;
   box-sizing: border-box;
+  touch-action: pan-x;     /* 横スクロールだけ許可 */
 }
 
-/* 素材画像 */
+/* 素材画像（フレーム / スタンプ / フレーズ） */
 .category img {
-  width: 110px;               /* 少し大きくして押しやすく */
-  height: 110px;
-  margin: 5px;
-  border: 2px solid #ff69b4;
-  border-radius: 12px;
-  background-color: white;
-  cursor: pointer;
-  object-fit: contain;        /* 画像が潰れない */
-  padding: 5px;
+  height: 90%;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+/* スクロールバーを少し控えめに（任意） */
+.category::-webkit-scrollbar {
+  height: 6px;
+}
+.category::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
 }
