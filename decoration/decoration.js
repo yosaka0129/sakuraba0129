@@ -31,6 +31,17 @@ function saveHistory() {
 }
 
 // ===============================
+// スマホでのピンチ時に画面が動かないようにする
+// ===============================
+canvas.addEventListener("touchstart", e => {
+  if (e.touches.length >= 2) e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener("touchmove", e => {
+  if (e.touches.length >= 2) e.preventDefault();
+}, { passive: false });
+
+// ===============================
 // 描画処理
 // ===============================
 function draw() {
@@ -54,10 +65,21 @@ function draw() {
     ctx.scale(obj.scale, obj.scale);
     ctx.drawImage(obj.img, -obj.w / 2, -obj.h / 2, obj.w, obj.h);
 
-    // 選択中の赤枠
+    // ---- 選択中の強調表示 ----
     if (obj === selected) {
+      // 白い太枠
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 6;
+      ctx.strokeRect(-obj.w / 2, -obj.h / 2, obj.w, obj.h);
+
+      // 赤い細枠
       ctx.strokeStyle = "red";
       ctx.lineWidth = 3;
+      ctx.strokeRect(-obj.w / 2, -obj.h / 2, obj.w, obj.h);
+
+      // 光る影（glow）
+      ctx.shadowColor = "rgba(255,0,0,0.7)";
+      ctx.shadowBlur = 20;
       ctx.strokeRect(-obj.w / 2, -obj.h / 2, obj.w, obj.h);
     }
 
@@ -78,33 +100,16 @@ canvas.addEventListener("click", e => {
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
 
-  // ---- 既存素材の選択判定 ----
+  // ---- 既存素材の選択判定（矩形判定）----
   selected = placed.find(obj => {
     const dx = x - obj.x;
     const dy = y - obj.y;
-    return Math.sqrt(dx * dx + dy * dy) < obj.w;
+    return Math.abs(dx) < obj.w / 2 && Math.abs(dy) < obj.h / 2;
   });
 
   if (selected) {
     draw();
     return;
-  }
-
-  // ---- 新規配置 ----
-  if (currentStamp) {
-    if (!currentStamp.complete) return; // 読み込み前なら配置しない
-
-    saveHistory();
-    placed.push({
-      img: currentStamp,
-      x,
-      y,
-      w: currentStamp.width,
-      h: currentStamp.height,
-      scale: 1,
-      angle: 0
-    });
-    draw();
   }
 });
 
@@ -192,6 +197,36 @@ document.getElementById("deleteBtn").onclick = () => {
 };
 
 // ===============================
+// 素材をタップしたら即キャンバス中央に配置
+// ===============================
+function placeStamp(imageObj, name) {
+  if (name === "frames") {
+    currentFrame = imageObj;
+    draw();
+    return;
+  }
+
+  currentStamp = imageObj;
+
+  const x = canvas.width / 2;
+  const y = canvas.height / 2;
+
+  saveHistory();
+  placed.push({
+    img: imageObj,
+    x,
+    y,
+    w: imageObj.width,
+    h: imageObj.height,
+    scale: 1,
+    angle: 0
+  });
+
+  selected = placed[placed.length - 1];
+  draw();
+}
+
+// ===============================
 // JSON から素材一覧を読み込む
 // ===============================
 function loadCategory(name) {
@@ -207,15 +242,13 @@ function loadCategory(name) {
 
         img.onclick = () => {
           const imageObj = new Image();
-          imageObj.onload = () => {
-            if (name === "frames") {
-              currentFrame = imageObj;
-            } else {
-              currentStamp = imageObj;
-            }
-            console.log("選択された素材:", imageObj.src);
-          };
           imageObj.src = img.src;
+
+          if (imageObj.complete) {
+            placeStamp(imageObj, name);
+          } else {
+            imageObj.onload = () => placeStamp(imageObj, name);
+          }
         };
 
         box.appendChild(img);
