@@ -124,19 +124,18 @@ function setFrame(src) {
 }
 
 // ===============================
-// 素材配置（★フレームはぴったり、スタンプは小さめ）
+// 素材配置
 // ===============================
 function placeStamp(imageObj) {
   saveHistory();
 
   let initialScale = 1;
 
-  // ★ フレームはキャンバスにぴったり
+  // フレームはぴったり
   if (imageObj.src.includes("frames")) {
     initialScale = Math.min(canvas.width / imageObj.width, canvas.height / imageObj.height);
   } else {
-    // ★ スタンプ・フレーズは小さめ
-    initialScale = 0.35;
+    initialScale = 0.35; // スタンプは小さめ
   }
 
   const obj = {
@@ -158,7 +157,7 @@ function placeStamp(imageObj) {
 }
 
 // ===============================
-// 素材一覧読み込み（★サムネイル縮小）
+// 素材一覧読み込み
 // ===============================
 function loadCategory(name) {
   fetch(`assets/${name}/list.json`)
@@ -170,8 +169,6 @@ function loadCategory(name) {
       files.forEach(file => {
         const img = document.createElement("img");
         img.src = `assets/${name}/${file}`;
-
-        
         img.style.objectFit = "contain";
         img.style.margin = "4px";
 
@@ -312,38 +309,33 @@ canvas.addEventListener("touchend", () => {
 });
 
 // ===============================
-// Undo
+// ★ 選択変更（ループ）
 // ===============================
-document.getElementById("undoBtn").onclick = () => {
-  if (history.length === 0) return;
+document.getElementById("cycleBtn").onclick = () => {
+  if (placed.length === 0) return;
 
-  const snapshot = JSON.parse(history.pop());
+  let index = placed.indexOf(selected);
+  index = (index + 1) % placed.length;
 
-  placed = snapshot.map(data => {
-    const img = new Image();
-    img.src = data.src;
+  selected = placed[index];
+  draw();
+};
 
-    const obj = {
-      img,
-      src: data.src,
-      x: data.x,
-      y: data.y,
-      w: data.w,
-      h: data.h,
-      scale: data.scale,
-      angle: data.angle,
-      hitCanvas: null
-    };
+// ===============================
+// ★ 消去（自動で次を選択）
+// ===============================
+document.getElementById("deleteBtn").onclick = () => {
+  if (!selected) return;
+  if (placed.length === 0) return;
 
-    img.onload = () => {
-      obj.hitCanvas = createHitCanvas(img);
-      draw();
-    };
+  const index = placed.indexOf(selected);
+  placed.splice(index, 1);
 
-    return obj;
-  });
-
-  selected = placed.length > 0 ? placed[placed.length - 1] : null;
+  if (placed.length > 0) {
+    selected = placed[index % placed.length];
+  } else {
+    selected = null;
+  }
 
   draw();
 };
