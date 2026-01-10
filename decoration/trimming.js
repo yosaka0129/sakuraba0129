@@ -1,16 +1,23 @@
 const canvas = document.getElementById("trimCanvas");
 const ctx = canvas.getContext("2d");
 
-// ==== 元コード：キャンバス初期設定 ====
+// ==== キャンバス初期設定（元コードを尊重しつつ調整） ====
+
 // キャンバス幅は元のまま
 canvas.width = window.innerWidth * 0.9;
 
-// ★ キャンバス高さは「画面の65%」にする（確定ボタンが必ず見える）
-canvas.height = window.innerHeight * 0.65;
+// ★ キャンバス高さは「画面の55%」にする（確定ボタンが必ず見える）
+canvas.height = window.innerHeight * 0.55;
 
 // 赤枠サイズ（元コード）
-const frameW = canvas.width * 0.8;
-const frameH = (frameW * 4) / 3;
+let frameW = canvas.width * 0.8;
+let frameH = (frameW * 4) / 3;
+
+// ★ 赤枠がキャンバスに収まらない場合は縮小
+if (frameH > canvas.height * 0.9) {
+  frameH = canvas.height * 0.9;
+  frameW = frameH * 0.75; // 4:3
+}
 
 // 赤枠位置（元コード）
 const frameX = (canvas.width - frameW) / 2;
@@ -63,6 +70,7 @@ document.getElementById("upload").onchange = (e) => {
       angle = 0;
       offsetX = 0;
       offsetY = 0;
+
       drawPhoto();
     };
     img.src = ev.target.result;
@@ -70,7 +78,7 @@ document.getElementById("upload").onchange = (e) => {
   reader.readAsDataURL(file);
 };
 
-// ==== ★ ジェスチャー操作（ワープしない版） ====
+// ==== ★ ジェスチャー操作（ワープしない安定版） ====
 let lastX = 0;
 let lastY = 0;
 let lastDist = 0;
@@ -98,7 +106,7 @@ canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
   if (!img) return;
 
-  // 1本指 → 移動（元コードの offset だけ変更）
+  // 1本指 → 移動
   if (e.touches.length === 1) {
     const t = e.touches[0];
     offsetX += t.clientX - lastX;
@@ -107,7 +115,7 @@ canvas.addEventListener("touchmove", (e) => {
     lastY = t.clientY;
   }
 
-  // 2本指 → 拡大縮小＋回転（画像中心は動かさない）
+  // 2本指 → 拡大縮小＋回転（中心は固定）
   if (e.touches.length === 2) {
     const t1 = e.touches[0];
     const t2 = e.touches[1];
@@ -117,10 +125,7 @@ canvas.addEventListener("touchmove", (e) => {
     const dist = Math.hypot(dx, dy);
     const ang = Math.atan2(dy, dx);
 
-    if (lastDist > 0) {
-      scale *= dist / lastDist;
-    }
-
+    if (lastDist > 0) scale *= dist / lastDist;
     angle += ang - lastAng;
 
     lastDist = dist;
