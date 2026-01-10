@@ -18,7 +18,7 @@ photo.onload = () => draw();
 // 素材管理
 // ===============================
 let placed = [];      // スタンプ・フレーズのみ
-let selected = null;  // 今動かせる素材（常に最新 or Undo 後の最後）
+let selected = null;  // 今動かせる素材
 let currentFrame = null; // フレームは 1 つだけ
 
 // ===============================
@@ -96,7 +96,7 @@ function draw() {
 }
 
 // ===============================
-// フレーム処理（タブ方式）
+// フレーム処理
 // ===============================
 function loadFrames() {
   fetch("assets/frames/list.json")
@@ -105,7 +105,6 @@ function loadFrames() {
       const box = document.getElementById("frames");
       box.innerHTML = "";
 
-      // フレーム一覧のみ（フレームなしボタンは作らない）
       files.forEach(file => {
         const img = document.createElement("img");
         img.src = `assets/frames/${file}`;
@@ -125,7 +124,7 @@ function setFrame(src) {
 }
 
 // ===============================
-// 素材配置（スタンプ・フレーズ）
+// 素材配置
 // ===============================
 function placeStamp(imageObj) {
   saveHistory();
@@ -143,8 +142,6 @@ function placeStamp(imageObj) {
   };
 
   placed.push(obj);
-
-  // ★ 最新の素材だけ操作対象にする
   selected = obj;
 
   draw();
@@ -185,9 +182,11 @@ function showCategory(name) {
 window.showCategory = showCategory;
 
 // ===============================
-// マウスドラッグ移動（selected だけ）
+// マウスドラッグ移動
 // ===============================
 let dragging = false;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
 
 canvas.addEventListener("mousedown", e => {
   if (!selected) return;
@@ -201,6 +200,8 @@ canvas.addEventListener("mousedown", e => {
 
   if (Math.abs(dx) < selected.w / 2 && Math.abs(dy) < selected.h / 2) {
     dragging = true;
+    dragOffsetX = dx;
+    dragOffsetY = dy;
   }
 });
 
@@ -208,8 +209,11 @@ canvas.addEventListener("mousemove", e => {
   if (!dragging || !selected) return;
 
   const rect = canvas.getBoundingClientRect();
-  selected.x = e.clientX - rect.left;
-  selected.y = e.clientY - rect.top;
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  selected.x = x - dragOffsetX;
+  selected.y = y - dragOffsetY;
 
   draw();
 });
@@ -233,6 +237,8 @@ canvas.addEventListener("touchstart", e => {
 
   if (Math.abs(dx) < selected.w / 2 && Math.abs(dy) < selected.h / 2) {
     dragging = true;
+    dragOffsetX = dx;
+    dragOffsetY = dy;
   }
 
   e.preventDefault();
@@ -244,8 +250,12 @@ canvas.addEventListener("touchmove", e => {
   if (e.touches.length === 1 && dragging) {
     const t = e.touches[0];
     const rect = canvas.getBoundingClientRect();
-    selected.x = t.clientX - rect.left;
-    selected.y = t.clientY - rect.top;
+    const x = t.clientX - rect.left;
+    const y = t.clientY - rect.top;
+
+    selected.x = x - dragOffsetX;
+    selected.y = y - dragOffsetY;
+
     draw();
     e.preventDefault();
     return;
@@ -255,7 +265,7 @@ canvas.addEventListener("touchmove", e => {
 canvas.addEventListener("touchend", () => dragging = false);
 
 // ===============================
-// スマホ：2本指ピンチ拡大・回転（selected だけ）
+// スマホ：2本指ピンチ拡大・回転
 // ===============================
 let lastDist = 0;
 let lastAngle = 0;
@@ -288,7 +298,7 @@ canvas.addEventListener("touchend", () => {
 });
 
 // ===============================
-// Undo（戻る：最後の素材を削除し、前のを選択状態に）
+// Undo
 // ===============================
 document.getElementById("undoBtn").onclick = () => {
   if (history.length === 0) return;
@@ -319,18 +329,43 @@ document.getElementById("undoBtn").onclick = () => {
     return obj;
   });
 
-  // ★ 復元後の最後の素材を選択状態にする
   selected = placed.length > 0 ? placed[placed.length - 1] : null;
 
   draw();
 };
 
 // ===============================
-// 保存
+// 保存（余白なしで保存）
 // ===============================
 document.getElementById("saveBtn").onclick = () => {
+  const scale = Math.min(canvas.width / photo.width, canvas.height / photo.height);
+  const w = photo.width * scale;
+  const h = photo.height * scale;
+  const offsetX = (canvas.width - w) / 2;
+  const offsetY = (canvas.height - h) / 2;
+
+  const saveCanvas = document.createElement("canvas");
+  saveCanvas.width = w;
+  saveCanvas.height = h;
+  const sctx = saveCanvas.getContext("2d");
+
+  sctx.drawImage(photo, 0, 0, w, h);
+
+  placed.forEach(obj => {
+    sctx.save();
+    sctx.translate(obj.x - offsetX, obj.y - offsetY);
+    sctx.rotate(obj.angle);
+    sctx.scale(obj.scale, obj.scale);
+    sctx.drawImage(obj.img, -obj.w / 2, -obj.h / 2, obj.w, obj.h);
+    sctx.restore();
+  });
+
+  if (currentFrame) {
+    sctx.drawImage(currentFrame, 0, 0, w, h);
+  }
+
   const link = document.createElement("a");
-  link.href = canvas.toDataURL("image/png");
+  link.href = saveCanvas.toDataURL("image/png");
   link.download = "decoration.png";
   link.click();
 };
