@@ -18,7 +18,7 @@ photo.onload = () => draw();
 // 素材管理
 // ===============================
 let placed = [];      // スタンプ・フレーズのみ
-let selected = null;  // 選択中の素材
+let selected = null;  // 今動かせる素材（常に最新 or Undo 後の最後）
 let currentFrame = null; // フレームは 1 つだけ
 
 // ===============================
@@ -105,17 +105,7 @@ function loadFrames() {
       const box = document.getElementById("frames");
       box.innerHTML = "";
 
-      // 先頭に「フレームなし」
-      const noneBtn = document.createElement("button");
-      noneBtn.textContent = "フレームなし";
-      noneBtn.style.marginRight = "10px";
-      noneBtn.onclick = () => {
-        currentFrame = null;
-        draw();
-      };
-      box.appendChild(noneBtn);
-
-      // フレーム一覧
+      // フレーム一覧のみ（フレームなしボタンは作らない）
       files.forEach(file => {
         const img = document.createElement("img");
         img.src = `assets/frames/${file}`;
@@ -153,7 +143,10 @@ function placeStamp(imageObj) {
   };
 
   placed.push(obj);
+
+  // ★ 最新の素材だけ操作対象にする
   selected = obj;
+
   draw();
 }
 
@@ -192,35 +185,7 @@ function showCategory(name) {
 window.showCategory = showCategory;
 
 // ===============================
-// 透明部分除去の選択処理（フレームは無視）
-// ===============================
-canvas.addEventListener("click", e => {
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  selected = placed.find(obj => {
-    const dx = x - obj.x;
-    const dy = y - obj.y;
-
-    const cos = Math.cos(-obj.angle);
-    const sin = Math.sin(-obj.angle);
-
-    const localX = (dx * cos - dy * sin) / obj.scale + obj.w / 2;
-    const localY = (dx * sin + dy * cos) / obj.scale + obj.h / 2;
-
-    if (localX < 0 || localX >= obj.w || localY < 0 || localY >= obj.h) return false;
-
-    const pixel = obj.hitCanvas.getContext("2d").getImageData(localX, localY, 1, 1).data;
-
-    return pixel[3] > 0;
-  });
-
-  draw();
-});
-
-// ===============================
-// マウスドラッグ移動
+// マウスドラッグ移動（selected だけ）
 // ===============================
 let dragging = false;
 
@@ -290,7 +255,7 @@ canvas.addEventListener("touchmove", e => {
 canvas.addEventListener("touchend", () => dragging = false);
 
 // ===============================
-// スマホ：2本指ピンチ拡大・回転
+// スマホ：2本指ピンチ拡大・回転（selected だけ）
 // ===============================
 let lastDist = 0;
 let lastAngle = 0;
@@ -323,18 +288,7 @@ canvas.addEventListener("touchend", () => {
 });
 
 // ===============================
-// 削除
-// ===============================
-document.getElementById("deleteBtn").onclick = () => {
-  if (!selected) return;
-  saveHistory();
-  placed = placed.filter(o => o !== selected);
-  selected = null;
-  draw();
-};
-
-// ===============================
-// Undo
+// Undo（戻る：最後の素材を削除し、前のを選択状態に）
 // ===============================
 document.getElementById("undoBtn").onclick = () => {
   if (history.length === 0) return;
@@ -365,7 +319,9 @@ document.getElementById("undoBtn").onclick = () => {
     return obj;
   });
 
-  selected = null;
+  // ★ 復元後の最後の素材を選択状態にする
+  selected = placed.length > 0 ? placed[placed.length - 1] : null;
+
   draw();
 };
 

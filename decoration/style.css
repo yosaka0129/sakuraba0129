@@ -103,12 +103,3 @@ html, body {
   margin-right: 10px;
   cursor: pointer;
 }
-
-/* フレームなしボタン */
-#frames button {
-  padding: 6px 10px;
-  margin-right: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background: #fff;
-}
