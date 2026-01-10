@@ -80,26 +80,28 @@ html, body {
   background: #fff;
 }
 
-/* 素材一覧（下部固定） */
+/* 素材一覧 */
 #categories {
-  height: 22vh;
+  height: 20vh;
   background: #fffdf5;
   border-top: 1px solid #f0c8d8;
   flex-shrink: 0;
 }
 
-/* 各カテゴリ（フレーム・スタンプ・フレーズ） */
+/* 各カテゴリ */
 .category {
   display: none;
   height: 100%;
   overflow-x: auto;
   white-space: nowrap;
-  padding: 8px;
+  padding: 6px;
   touch-action: pan-x;
 }
 
 .category img {
-  height: 90%;
-  margin-right: 10px;
+  height: 60px;
+  width: 60px;
+  object-fit: contain;
+  margin-right: 8px;
   cursor: pointer;
 }

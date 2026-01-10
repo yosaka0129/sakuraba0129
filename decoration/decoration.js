@@ -17,9 +17,9 @@ photo.onload = () => draw();
 // ===============================
 // 素材管理
 // ===============================
-let placed = [];      // スタンプ・フレーズのみ
-let selected = null;  // 今動かせる素材
-let currentFrame = null; // フレームは 1 つだけ
+let placed = [];      // スタンプ・フレーズ
+let selected = null;  // 選択中の素材
+let currentFrame = null; // フレームは1つだけ
 
 // ===============================
 // Undo 用
@@ -124,10 +124,20 @@ function setFrame(src) {
 }
 
 // ===============================
-// 素材配置
+// 素材配置（★フレームはぴったり、スタンプは小さめ）
 // ===============================
 function placeStamp(imageObj) {
   saveHistory();
+
+  let initialScale = 1;
+
+  // ★ フレームはキャンバスにぴったり
+  if (imageObj.src.includes("frames")) {
+    initialScale = Math.min(canvas.width / imageObj.width, canvas.height / imageObj.height);
+  } else {
+    // ★ スタンプ・フレーズは小さめ
+    initialScale = 0.35;
+  }
 
   const obj = {
     img: imageObj,
@@ -136,7 +146,7 @@ function placeStamp(imageObj) {
     y: canvas.height / 2,
     w: imageObj.width,
     h: imageObj.height,
-    scale: 1,
+    scale: initialScale,
     angle: 0,
     hitCanvas: createHitCanvas(imageObj)
   };
@@ -148,7 +158,7 @@ function placeStamp(imageObj) {
 }
 
 // ===============================
-// 素材一覧読み込み
+// 素材一覧読み込み（★サムネイル縮小）
 // ===============================
 function loadCategory(name) {
   fetch(`assets/${name}/list.json`)
@@ -160,6 +170,11 @@ function loadCategory(name) {
       files.forEach(file => {
         const img = document.createElement("img");
         img.src = `assets/${name}/${file}`;
+
+        img.style.width = "60px";
+        img.style.height = "60px";
+        img.style.objectFit = "contain";
+        img.style.margin = "4px";
 
         img.onclick = () => {
           const imageObj = new Image();
