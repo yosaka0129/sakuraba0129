@@ -7,39 +7,38 @@
     html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
-      overflow: hidden; /* スクロールさせない */
-    }
-    body {
-      background-color: #ffeef4; /* 薄ピンク */
+      overflow: hidden; /* ← スクロール禁止 */
+      background-color: #ffeef4;
       font-family: "Hiragino Kaku Gothic ProN", sans-serif;
       text-align: center;
-      padding: 10px;
-      box-sizing: border-box;
     }
+
     h2 {
       color: #ff6699;
-      margin-bottom: 8px;
-      font-weight: bold;   /* 太文字 */
+      margin: 10px 0 6px 0;
+      font-weight: bold;   /* 太字 */
       font-size: 18px;     /* 小さめ */
     }
-    canvas {
-      border: 3px solid #ff99bb;
-      max-width: 100%;
-      display: block;
-      margin: 0 auto;
-      background-color: white;
-      touch-action: none; /* ジェスチャー用 */
-    }
+
     input[type="file"] {
       font-size: 20px;
       padding: 10px;
       border-radius: 12px;
       background-color: #fff0f5;
       border: 2px solid #ff99bb;
+      margin-bottom: 10px;
     }
+
+    canvas {
+      border: 3px solid #ff99bb;
+      background-color: white;
+      display: block;
+      margin: 0 auto;
+      touch-action: none; /* ← ジェスチャー操作のため */
+      max-width: 100%;
+    }
+
     #confirmBtn {
-      margin-top: 12px;
       font-size: 24px;
       padding: 14px 40px;
       border-radius: 18px;
@@ -47,12 +46,16 @@
       color: white;
       border: none;
       box-shadow: 0 4px 0 #ff6b95;
+      margin-top: 10px;
     }
   </style>
 </head>
+
 <body>
+
   <h2>写真をアップロードしてトリミング</h2>
-  <input type="file" id="upload" accept="image/*"><br><br>
+
+  <input type="file" id="upload" accept="image/*">
 
   <canvas id="trimCanvas"></canvas>
 
