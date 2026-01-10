@@ -171,8 +171,7 @@ function loadCategory(name) {
         const img = document.createElement("img");
         img.src = `assets/${name}/${file}`;
 
-        img.style.width = "60px";
-        img.style.height = "60px";
+        
         img.style.objectFit = "contain";
         img.style.margin = "4px";
 
