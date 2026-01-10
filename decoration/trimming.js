@@ -1,35 +1,36 @@
 const canvas = document.getElementById("trimCanvas");
 const ctx = canvas.getContext("2d");
 
-// ==== 元コードそのまま：キャンバス初期設定 ====
+// ==== 元コード：キャンバス初期設定 ====
+// キャンバス幅は元のまま
 canvas.width = window.innerWidth * 0.9;
 
-// まず横幅から赤枠サイズを決める
+// ★ キャンバス高さは「画面の65%」にする（確定ボタンが必ず見える）
+canvas.height = window.innerHeight * 0.65;
+
+// 赤枠サイズ（元コード）
 const frameW = canvas.width * 0.8;
 const frameH = (frameW * 4) / 3;
 
-// 赤枠が必ず収まるようにキャンバス高さを調整（元コード）
-canvas.height = frameH + 200; // 上下100pxずつ余白
-
-// 赤枠の位置（元コード）
+// 赤枠位置（元コード）
 const frameX = (canvas.width - frameW) / 2;
 const frameY = (canvas.height - frameH) / 2;
 
 let img = null;
 let baseScale = 1;
 let scale = 1;
-let angle = 0; // ラジアンに変更
+let angle = 0; // ラジアン
 let offsetX = 0;
 let offsetY = 0;
 
-// ==== 元コード：赤枠描画 ====
+// ==== 赤枠描画（元コード） ====
 function drawFrame() {
   ctx.strokeStyle = "red";
   ctx.lineWidth = 5;
   ctx.strokeRect(frameX, frameY, frameW, frameH);
 }
 
-// ==== 元コード：描画処理 ====
+// ==== 描画処理（元コード） ====
 function drawPhoto() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -48,7 +49,7 @@ function drawPhoto() {
   drawFrame();
 }
 
-// ==== 元コード：アップロード ====
+// ==== アップロード（元コード） ====
 document.getElementById("upload").onchange = (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -62,7 +63,6 @@ document.getElementById("upload").onchange = (e) => {
       angle = 0;
       offsetX = 0;
       offsetY = 0;
-
       drawPhoto();
     };
     img.src = ev.target.result;
@@ -70,11 +70,11 @@ document.getElementById("upload").onchange = (e) => {
   reader.readAsDataURL(file);
 };
 
-// ==== ★追加：ジェスチャー操作（元コードを壊さない） ====
+// ==== ★ ジェスチャー操作（ワープしない版） ====
 let lastX = 0;
 let lastY = 0;
 let lastDist = 0;
-let lastAngle = 0;
+let lastAng = 0;
 
 canvas.addEventListener("touchstart", (e) => {
   e.preventDefault();
@@ -90,7 +90,7 @@ canvas.addEventListener("touchstart", (e) => {
     const dx = t2.clientX - t1.clientX;
     const dy = t2.clientY - t1.clientY;
     lastDist = Math.hypot(dx, dy);
-    lastAngle = Math.atan2(dy, dx);
+    lastAng = Math.atan2(dy, dx);
   }
 }, { passive: false });
 
@@ -98,7 +98,7 @@ canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
   if (!img) return;
 
-  // 1本指 → 移動
+  // 1本指 → 移動（元コードの offset だけ変更）
   if (e.touches.length === 1) {
     const t = e.touches[0];
     offsetX += t.clientX - lastX;
@@ -107,7 +107,7 @@ canvas.addEventListener("touchmove", (e) => {
     lastY = t.clientY;
   }
 
-  // 2本指 → 拡大縮小＋回転
+  // 2本指 → 拡大縮小＋回転（画像中心は動かさない）
   if (e.touches.length === 2) {
     const t1 = e.touches[0];
     const t2 = e.touches[1];
@@ -117,11 +117,14 @@ canvas.addEventListener("touchmove", (e) => {
     const dist = Math.hypot(dx, dy);
     const ang = Math.atan2(dy, dx);
 
-    if (lastDist > 0) scale *= dist / lastDist;
-    angle += ang - lastAngle;
+    if (lastDist > 0) {
+      scale *= dist / lastDist;
+    }
+
+    angle += ang - lastAng;
 
     lastDist = dist;
-    lastAngle = ang;
+    lastAng = ang;
   }
 
   drawPhoto();
@@ -129,10 +132,10 @@ canvas.addEventListener("touchmove", (e) => {
 
 canvas.addEventListener("touchend", () => {
   lastDist = 0;
-  lastAngle = 0;
+  lastAng = 0;
 });
 
-// ==== 元コード：トリミング ====
+// ==== トリミング（元コード） ====
 document.getElementById("confirmBtn").onclick = () => {
   if (!img) {
     alert("まず写真をアップロードしてください！");
