@@ -105,7 +105,16 @@ canvas.addEventListener("touchstart", (e) => {
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
   if (!img) return;
+  // ★ 2本指 → 1本指に移行した瞬間のワープ防止
+  if (e.touches.length === 1 && lastDist !== 0) {
+    const t = e.touches[0];
+    lastX = t.clientX;
+    lastY = t.clientY;
+    lastDist = 0;   // 2本指の状態をリセット
+    lastAng = 0;
+  }
 
+  
   // 1本指 → 移動
   if (e.touches.length === 1) {
     const t = e.touches[0];
