@@ -3,153 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <title>写真トリミング</title>
-  <style>
-    body {
-      background-color: #ffeef4; /* 薄ピンク */
-      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
-      text-align: center;
-      padding: 10px;
-    }
-    h2 {
-      color: #ff6699;
-      margin-bottom: 8px;
-    }
-    canvas {
-      border: 3px solid #ff99bb;
-      max-width: 100%;
-      display: block;
-      margin: 0 auto;
-      background-color: white;
-    }
-    input[type="file"] {
-      font-size: 24px;
-      padding: 14px;
-      border-radius: 12px;
-      background-color: #fff0f5;
-      border: 2px solid #ff99bb;
-    }
-    .controls {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-      padding: 0 10px;
-      gap: 10px;
-    }
-    .left-controls, .right-controls {
-      flex: 1;
-    }
-    .right-controls {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-    }
-
-    /* 十字キー：横広がり（見た目だけ回転） */
-    .dpad {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      gap: 24px;
-    }
-    .vertical { /* ↑↓を縦に */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .horizontal { /* ←→を横に */
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 12px;
-    }
-    .dpad button {
-      width: 140px;   /* さらに大きく */
-      height: 140px;
-      font-size: 40px;
-      border-radius: 18px;
-      background-color: #ffc0cb;
-      border: none;
-      box-shadow: 0 4px 0 #ff99bb;
-    }
-
-    /* スライダーを太く、つまみを超大に */
-    input[type="range"] {
-      width: 95%;
-      height: 70px;
-      margin: 25px 0;
-      accent-color: #ff6699;
-      -webkit-appearance: none;
-    }
-    input[type="range"]::-webkit-slider-runnable-track {
-      height: 20px;
-      background: #ffd1dc;
-      border-radius: 10px;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      width: 60px;
-      height: 60px;
-      margin-top: -20px; /* トラック中央に合わせる */
-      border-radius: 50%;
-      background: #ff6699;
-      cursor: pointer;
-      -webkit-appearance: none;
-      box-shadow: 0 3px 0 #ff99bb;
-    }
-    input[type="range"]::-moz-range-track {
-      height: 20px;
-      background: #ffd1dc;
-      border-radius: 10px;
-    }
-    input[type="range"]::-moz-range-thumb {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: #ff6699;
-      cursor: pointer;
-      box-shadow: 0 3px 0 #ff99bb;
-    }
-
-    #confirmBtn {
-      margin-top: 25px;
-      font-size: 28px;
-      padding: 18px 56px;
-      border-radius: 18px;
-      background-color: #ff99bb;
-      color: white;
-      border: none;
-      box-shadow: 0 4px 0 #ff6b95;
-    }
-  </style>
+  <link rel="stylesheet" href="trim-style.css">
 </head>
 <body>
+
   <h2>写真をアップロードしてトリミング</h2>
-  <input type="file" id="upload" accept="image/*"><br><br>
+
+  <input type="file" id="upload" accept="image/*" style="display:block;margin:0 auto 6px auto;">
 
   <canvas id="trimCanvas"></canvas>
-
-  <div class="controls">
-    <div class="left-controls">
-      拡大縮小:<br>
-      <input type="range" id="scaleRange" min="0.5" max="3" step="0.01" value="1"><br>
-      回転:<br>
-      <input type="range" id="rotateRange" min="0" max="360" step="1" value="0"><br>
-    </div>
-    <div class="right-controls">
-      <div class="dpad">
-        <!-- 上下を縦に、左右を横に（見た目は横広がり） -->
-        <div class="vertical">
-          <button id="moveUp">↑</button>
-          <button id="moveDown">↓</button>
-        </div>
-        <div class="horizontal">
-          <button id="moveLeft">←</button>
-          <button id="moveRight">→</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <button id="confirmBtn">確定</button>
 
