@@ -82,7 +82,7 @@ html, body {
 
 /* 素材一覧 */
 #categories {
-  height: 20vh;
+  height: 24vh;
   background: #fffdf5;
   border-top: 1px solid #f0c8d8;
   flex-shrink: 0;
@@ -99,8 +99,8 @@ html, body {
 }
 
 .category img {
-  height: 60px;
-  width: 60px;
+  height: 80px;
+  width: 80px;
   object-fit: contain;
   margin-right: 8px;
   cursor: pointer;
