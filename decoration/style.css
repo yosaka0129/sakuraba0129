@@ -16,36 +16,6 @@ html, body {
   overflow: hidden;
 }
 
-/* フレームバー */
-#frameBar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px;
-  background: #ffeef5;
-  border-bottom: 1px solid #f0c8d8;
-}
-
-#noFrameBtn {
-  padding: 6px 10px;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.frame-scroll {
-  flex: 1;
-  display: flex;
-  overflow-x: auto;
-  white-space: nowrap;
-  gap: 10px;
-}
-
-.frame-scroll img {
-  height: 60px;
-  cursor: pointer;
-}
-
 /* タイトル */
 #header {
   text-align: center;
@@ -53,6 +23,11 @@ html, body {
   background: #ffb6c1;
   color: #fff;
   flex-shrink: 0;
+}
+
+#header h2 {
+  margin: 0;
+  font-size: 18px;
 }
 
 /* キャンバス領域 */
@@ -81,6 +56,11 @@ html, body {
   gap: 10px;
 }
 
+#actionButtons button {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
 /* タブ */
 #tabs {
   display: flex;
@@ -88,16 +68,27 @@ html, body {
   gap: 10px;
   padding: 6px;
   background: #fafafa;
+  border-top: 1px solid #f0c8d8;
   flex-shrink: 0;
 }
 
-/* 素材一覧 */
+#tabs button {
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+/* 素材一覧（下部固定） */
 #categories {
   height: 22vh;
   background: #fffdf5;
   border-top: 1px solid #f0c8d8;
+  flex-shrink: 0;
 }
 
+/* 各カテゴリ（フレーム・スタンプ・フレーズ） */
 .category {
   display: none;
   height: 100%;
@@ -110,4 +101,14 @@ html, body {
 .category img {
   height: 90%;
   margin-right: 10px;
+  cursor: pointer;
+}
+
+/* フレームなしボタン */
+#frames button {
+  padding: 6px 10px;
+  margin-right: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
 }

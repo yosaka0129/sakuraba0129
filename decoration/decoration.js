@@ -96,15 +96,26 @@ function draw() {
 }
 
 // ===============================
-// フレーム処理（1つだけ）
+// フレーム処理（タブ方式）
 // ===============================
 function loadFrames() {
   fetch("assets/frames/list.json")
     .then(res => res.json())
     .then(files => {
-      const box = document.getElementById("frameList");
+      const box = document.getElementById("frames");
       box.innerHTML = "";
 
+      // 先頭に「フレームなし」
+      const noneBtn = document.createElement("button");
+      noneBtn.textContent = "フレームなし";
+      noneBtn.style.marginRight = "10px";
+      noneBtn.onclick = () => {
+        currentFrame = null;
+        draw();
+      };
+      box.appendChild(noneBtn);
+
+      // フレーム一覧
       files.forEach(file => {
         const img = document.createElement("img");
         img.src = `assets/frames/${file}`;
@@ -122,11 +133,6 @@ function setFrame(src) {
     draw();
   };
 }
-
-document.getElementById("noFrameBtn").onclick = () => {
-  currentFrame = null;
-  draw();
-};
 
 // ===============================
 // 素材配置（スタンプ・フレーズ）
@@ -186,7 +192,7 @@ function showCategory(name) {
 window.showCategory = showCategory;
 
 // ===============================
-// 透明部分除去の選択処理
+// 透明部分除去の選択処理（フレームは無視）
 // ===============================
 canvas.addEventListener("click", e => {
   const rect = canvas.getBoundingClientRect();
@@ -376,6 +382,5 @@ document.getElementById("saveBtn").onclick = () => {
 // ===============================
 // 初期化
 // ===============================
-["stamps", "phrases"].forEach(loadCategory);
-loadFrames();
-showCategory("stamps");
+["frames", "stamps", "phrases"].forEach(loadCategory);
+showCategory("frames");
