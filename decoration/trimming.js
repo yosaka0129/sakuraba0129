@@ -9,7 +9,7 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth * 0.9;
 
 // ★ キャンバス高さは「画面の65%」
-canvas.height = window.innerHeight * 0.65;
+canvas.height = window.innerHeight * 0.75;
 
 // 赤枠サイズ（元コード）
 let frameW = canvas.width * 0.8;
