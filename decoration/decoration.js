@@ -1,4 +1,11 @@
 // ===============================
+// 写真読み込み（← photo を最初に宣言するのが重要）
+// ===============================
+let photo = new Image();
+photo.src = sessionStorage.getItem("croppedPhoto");
+photo.onload = () => draw();
+
+// ===============================
 // Canvas 初期設定
 // ===============================
 const canvas = document.getElementById("canvas");
@@ -6,13 +13,6 @@ const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth * 0.9;
 canvas.height = window.innerHeight * 0.6;
-
-// ===============================
-// 写真読み込み
-// ===============================
-let photo = new Image();
-photo.src = sessionStorage.getItem("croppedPhoto");
-photo.onload = () => draw();
 
 // ===============================
 // 素材管理
@@ -322,7 +322,7 @@ document.getElementById("cycleBtn").onclick = () => {
 };
 
 // ===============================
-// ★ 消去（自動で次を選択）
+/* ★ 消去（自動で次を選択） */
 // ===============================
 document.getElementById("deleteBtn").onclick = () => {
   if (!selected) return;
@@ -377,7 +377,7 @@ document.getElementById("saveBtn").onclick = () => {
 };
 
 // ===============================
-// 初期化
+// 初期化（★ celebration を追加）
 // ===============================
-["frames", "stamps", "phrases"].forEach(loadCategory);
+["frames", "celebration", "stamps", "phrases"].forEach(loadCategory);
 showCategory("frames");

@@ -1,134 +1,109 @@
-/* 全体レイアウト（デバイスにぴったり） */
 html, body {
   margin: 0;
   padding: 0;
-  height: 100vh;
-  overflow: hidden; /* スクロール禁止 */
-  font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
-  background: #fff7fb;
-  color: #444;
+  overflow: hidden;
+  height: 100%;
+  touch-action: none;
+  font-family: system-ui, sans-serif;
+  background: linear-gradient(135deg, #ffe4f0, #e3f2ff);
 }
 
-/* アプリ全体を縦に並べる */
 #app {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  max-width: 900px;
-  margin: auto;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* タイトル */
 #header {
   text-align: center;
   padding: 8px 0;
+  background: #ffb6c1;
+  color: #fff;
+  flex-shrink: 0;
 }
 
 #header h2 {
-  font-size: 1.4rem;
-  color: #ff6fa8;
   margin: 0;
+  font-size: 18px;
 }
 
-/* キャンバス領域（画面の割合で調整） */
+/* キャンバス領域 */
 #canvasArea {
-  height: 62vh; /* ← 画面の62%をキャンバスにする（万能値） */
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  background: rgba(255,255,255,0.8);
 }
 
-/* キャンバスは領域いっぱいにフィット */
 #canvas {
   width: 100%;
-  height: 100%;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2);
-  object-fit: contain;
+  max-height: 65vh;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.15);
+  touch-action: none;
 }
 
-/* アクションボタン */
+/* ボタン（押しやすく大きく） */
 #actionButtons {
-  margin-top: 6px;
+  margin-top: 8px;
   display: flex;
-  justify-content: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 #actionButtons button {
-  padding: 10px 18px;
-  font-size: 0.9rem;
-  border: none;
-  border-radius: 25px;
-  background: #ffb6d9;
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 3px 8px rgba(255, 105, 180, 0.3);
-  transition: 0.2s;
+  padding: 12px 20px;   /* ← 大きく */
+  font-size: 16px;      /* ← 見やすく */
+  border-radius: 8px;
 }
 
-#actionButtons button:hover {
-  background: #ff8fc4;
-  transform: translateY(-2px);
-}
-
-/* タブボタン */
+/* タブ（大きく押しやすく） */
 #tabs {
   display: flex;
   justify-content: center;
   gap: 10px;
-  padding: 6px 0;
+  padding: 6px;
+  background: #fafafa;
+  border-top: 1px solid #f0c8d8;
+  flex-shrink: 0;
 }
 
 #tabs button {
-  padding: 8px 14px;
-  font-size: 0.9rem;
-  border: none;
-  border-radius: 20px;
-  background: #ffd7ec;
-  cursor: pointer;
-  transition: 0.2s;
+  padding: 12px 18px;   /* ← 大きく */
+  font-size: 16px;      /* ← 見やすく */
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
 }
 
-#tabs button:hover {
-  background: #ffb6d9;
-}
-
-/* 素材一覧（横スクロール） */
+/* 素材一覧 */
 #categories {
-  padding: 4px 0;
+  height: 24vh;
+  background: #fffdf5;
+  border-top: 1px solid #f0c8d8;
+  flex-shrink: 0;
 }
 
-/* 素材一覧（高さは固定、キャンバスと独立） */
+/* 各カテゴリ */
 .category {
   display: none;
-  flex-direction: row;
+  height: 100%;
   overflow-x: auto;
   white-space: nowrap;
-  gap: 10px;
-  padding: 10px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.15);
-  height: 130px;
-}
-
-.category img {
-  width: 100px;
-  height: 100px;
-  object-fit: contain;
-  background: #fff0f7;
-  border-radius: 10px;
   padding: 6px;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: 0.2s;
+  touch-action: pan-x;
 }
 
-.category img:hover {
-  background: #ffe2f1;
-  transform: scale(1.05);
+/* 素材画像（大きく） */
+.category img {
+  height: 160px;        /* ← 大きく */
+  width: 160px;         /* ← 大きく */
+  object-fit: contain;
+  margin-right: 10px;
+  cursor: pointer;
 }
