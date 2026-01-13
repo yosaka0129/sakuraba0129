@@ -38,32 +38,36 @@ html, body {
   align-items: center;
   justify-content: center;
   background: rgba(255,255,255,0.8);
-  padding: 0;              /* ← 余白を消す */
+  padding: 0;
 }
 
 #canvas {
   width: 100%;
-  height: 100%;            /* ← max-height をやめて上下の空白を消す */
+  height: 100%;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 0 12px rgba(0,0,0,0.15);
   touch-action: none;
 }
 
-/* ボタン（さらに大きく） */
+/* アクションボタン（ピンクでかわいく） */
 #actionButtons {
-  margin-top: 6px;         /* ← 少しだけ余白 */
+  margin-top: 6px;
   display: flex;
   gap: 12px;
 }
 
 #actionButtons button {
-  padding: 16px 26px;      /* ← さらに大きく */
-  font-size: 18px;         /* ← 見やすく */
-  border-radius: 10px;
+  padding: 16px 26px;
+  font-size: 18px;
+  border-radius: 14px;
+  background: #ffb6c1;          /* ★ ピンク */
+  color: #fff;
+  border: none;
+  box-shadow: 0 3px 6px rgba(255, 182, 193, 0.5); /* ふんわり影 */
 }
 
-/* タブ（さらに大きく） */
+/* タブ（ピンクでかわいく） */
 #tabs {
   display: flex;
   justify-content: center;
@@ -75,16 +79,18 @@ html, body {
 }
 
 #tabs button {
-  padding: 16px 24px;      /* ← さらに大きく */
-  font-size: 18px;         /* ← 見やすく */
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  background: #fff;        /* ← 色は変えない */
+  padding: 16px 24px;
+  font-size: 18px;
+  border-radius: 14px;
+  background: #ffb6c1;          /* ★ ピンク */
+  color: #fff;
+  border: none;
+  box-shadow: 0 3px 6px rgba(255, 182, 193, 0.5);
 }
 
 /* 素材一覧 */
 #categories {
-  height: 26vh;            /* ← ボタンが大きくなったので少し調整 */
+  height: 26vh;
   background: #fffdf5;
   border-top: 1px solid #f0c8d8;
   flex-shrink: 0;
@@ -102,7 +108,7 @@ html, body {
 
 /* 素材画像（大きく） */
 .category img {
-  height: 170px;           /* ← さらに大きく */
+  height: 170px;
   width: 170px;
   object-fit: contain;
   margin-right: 12px;
