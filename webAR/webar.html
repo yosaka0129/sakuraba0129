@@ -12,7 +12,7 @@
       margin: 0;
       overflow: hidden;
       background: black;
-      font-family: 'Zen Maru Gothic', sans-serif; /* ← 全体を丸ゴシックに */
+      font-family: 'Zen Maru Gothic', sans-serif;
     }
 
     #camera {
@@ -89,6 +89,24 @@
       text-shadow: 0 0 10px #ff99dd, 0 0 20px #ff66cc;
       z-index: 10;
       pointer-events: none;
+    }
+
+    /* ★★★ スマホ（縦画面）用レイアウト調整 ★★★ */
+    @media screen and (max-width: 768px) and (orientation: portrait) {
+
+      #nameText {
+        top: 75%;        /* ← スマホでは下へ */
+        font-size: 36px;
+      }
+
+      #birthdayText {
+        top: 83%;        /* ← さらに下へ */
+        font-size: 30px;
+      }
+
+      #dateText {
+        font-size: 20px;
+      }
     }
   </style>
 
