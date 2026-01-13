@@ -16,11 +16,19 @@ export function initFireworks(sharedScene) {
 
 // ---------------- FireworkBall ----------------
 export class FireworkBall {
-  constructor(position = new THREE.Vector3(0, -2, -5)) {
+
+  // ★ 変更：デフォルト位置を画面全体に散らす
+  constructor(position = null) {
     this.age = 0;
     this.lifespan = 50;
 
-    // 本体
+    if (!position) {
+      const x = (Math.random() - 0.5) * 6.0;   // 左右いっぱい
+      const y = -2.5 + Math.random() * 2.5;    // 下〜中央
+      const z = -4.5 + Math.random() * 1.0;    // 奥行き少しランダム
+      position = new THREE.Vector3(x, y, z);
+    }
+
     this.geometry = new THREE.BufferGeometry();
     this.geometry.setAttribute(
       'position',
@@ -42,13 +50,14 @@ export class FireworkBall {
     this.points.position.copy(position);
     scene.add(this.points);
 
+    // ★ 変更：上昇速度もランダム化して開く高さを散らす
     this.velocity = new THREE.Vector3(
       (Math.random() - 0.5) * 0.02,
-      0.09 + Math.random() * 0.03,
-      0
+      0.08 + Math.random() * 0.05,
+      (Math.random() - 0.5) * 0.01
     );
 
-    // ★ 軽量化：trail を固定数の Points で使い回す
+    // ★ trail（軌跡）
     this.maxTrail = 12;
     this.trail = [];
 
@@ -83,16 +92,13 @@ export class FireworkBall {
     this.points.position.add(this.velocity);
     this.velocity.y -= 0.002;
 
-    // ★ 軌跡の更新（new しない）
     for (let i = this.maxTrail - 1; i > 0; i--) {
       const prev = this.trail[i - 1].p.position;
       this.trail[i].p.position.copy(prev);
     }
 
-    // 先頭に現在位置
     this.trail[0].p.position.copy(this.points.position);
 
-    // opacity を古いほど薄く
     for (let i = 0; i < this.maxTrail; i++) {
       const t = 1 - i / this.maxTrail;
       const item = this.trail[i];
@@ -100,14 +106,12 @@ export class FireworkBall {
       item.p.visible = true;
     }
 
-    // 寿命で爆発
     if (this.age >= this.lifespan) {
       fireworks.push(new Explosion(this.points.position.clone(), false));
       scene.remove(this.points);
       this.geometry.dispose();
       this.material.dispose();
 
-      // trail の後処理
       for (const item of this.trail) {
         scene.remove(item.p);
         item.geo.dispose();
@@ -123,7 +127,7 @@ export class FireworkBall {
   }
 }
 
-// ---------------- Explosion ----------------
+// ---------------- Explosion（普通の花火） ----------------
 export class Explosion {
   constructor(position, isSecond = false) {
     const count = 700;
@@ -134,7 +138,9 @@ export class Explosion {
     for (let i = 0; i < count; i++) {
       const theta = Math.random() * 2 * Math.PI;
       const phi = Math.acos(2 * Math.random() - 1);
-      const speed = Math.random() * 0.07 + 0.03;
+
+      // ★ 変更：広がりを強くして画面全体に広がる
+      const speed = Math.random() * 0.09 + 0.04;
 
       const vx = speed * Math.sin(phi) * Math.cos(theta);
       const vy = speed * Math.sin(phi) * Math.sin(theta);
@@ -171,7 +177,6 @@ export class Explosion {
     this.explodedOnce = false;
     this.shouldExplodeTwice = Math.random() < 0.4;
 
-    // 🔥 分割前と同じ：即時再生
     playSound(isSecond ? fireworkBuffer : fireworkBuffer2);
   }
 
@@ -199,13 +204,9 @@ export class Explosion {
       this.material.size = 0.085;
     }
 
-    // 二段爆発
     if (this.age === 30 && this.shouldExplodeTwice && !this.explodedOnce) {
       fireworks.push(new Explosion(this.points.position.clone(), true));
-
-      // 🔥 分割前と同じ：即時再生
       playSound(fireworkBuffer);
-
       this.explodedOnce = true;
     }
   }
@@ -219,7 +220,7 @@ export class Explosion {
   }
 }
 
-// ---------------- ShapeExplosion ----------------
+// ---------------- ShapeExplosion（ハート・さくら） ----------------
 export class ShapeExplosion {
   constructor(position, type = "heart") {
     this.type = type;
@@ -238,9 +239,11 @@ export class ShapeExplosion {
 
       if (type === "heart") {
         const t = Math.random() * 2 * Math.PI;
-        x = 8 * Math.pow(Math.sin(t), 3);
-        y = 6.5 * Math.cos(t) - 2.5 * Math.cos(2*t)
-          - 1 * Math.cos(3*t) - 0.5*Math.cos(4*t);
+
+        // ★ 変更：ハートの形を大きく
+        x = 14 * Math.pow(Math.sin(t), 3);
+        y = 11 * Math.cos(t) - 4 * Math.cos(2*t)
+            - 1.6 * Math.cos(3*t) - 0.8 * Math.cos(4*t);
 
         rx = x * cosA - y * sinA;
         ry = x * sinA + y * cosA;
@@ -250,7 +253,8 @@ export class ShapeExplosion {
         this.positions[i*3+1] = 0;
         this.positions[i*3+2] = 0;
 
-        this.velocities.push(new THREE.Vector3(rx * 0.01, ry * 0.01, vz));
+        // ★ 変更：広がりも大きく
+        this.velocities.push(new THREE.Vector3(rx * 0.025, ry * 0.025, vz));
 
       } else if (type === "sakura") {
         const spikes = 5;
@@ -268,7 +272,7 @@ export class ShapeExplosion {
         this.positions[i*3+1] = 0;
         this.positions[i*3+2] = 0;
 
-        this.velocities.push(new THREE.Vector3(rx * 0.07, ry * 0.07, vz));
+        this.velocities.push(new THREE.Vector3(rx * 0.14, ry * 0.14, vz));
       }
     }
 
