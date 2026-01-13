@@ -1,35 +1,25 @@
 // ===============================
-// Canvas 初期設定（画面にフィット）
+// Canvas 初期設定
 // ===============================
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+canvas.width = window.innerWidth * 0.9;
+canvas.height = window.innerHeight * 0.6;
+
 // ===============================
-// 写真読み込み（← photo を先に定義するのが重要）
+// 写真読み込み
 // ===============================
 let photo = new Image();
 photo.src = sessionStorage.getItem("croppedPhoto");
 photo.onload = () => draw();
 
 // ===============================
-// Canvas リサイズ
-// ===============================
-function resizeCanvas() {
-  const area = document.getElementById("canvasArea");
-  canvas.width = area.clientWidth;
-  canvas.height = area.clientHeight;
-  draw();
-}
-
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-
-// ===============================
 // 素材管理
 // ===============================
-let placed = [];
-let selected = null;
-let currentFrame = null;
+let placed = [];      // スタンプ・フレーズ
+let selected = null;  // 選択中の素材
+let currentFrame = null; // フレームは1つだけ
 
 // ===============================
 // Undo 用
@@ -139,7 +129,14 @@ function setFrame(src) {
 function placeStamp(imageObj) {
   saveHistory();
 
-  let initialScale = 0.35;
+  let initialScale = 1;
+
+  // フレームはぴったり
+  if (imageObj.src.includes("frames")) {
+    initialScale = Math.min(canvas.width / imageObj.width, canvas.height / imageObj.height);
+  } else {
+    initialScale = 0.35; // スタンプは小さめ
+  }
 
   const obj = {
     img: imageObj,
@@ -172,11 +169,15 @@ function loadCategory(name) {
       files.forEach(file => {
         const img = document.createElement("img");
         img.src = `assets/${name}/${file}`;
+        img.style.objectFit = "contain";
+        img.style.margin = "4px";
+
         img.onclick = () => {
           const imageObj = new Image();
           imageObj.src = img.src;
           imageObj.onload = () => placeStamp(imageObj);
         };
+
         box.appendChild(img);
       });
     });
@@ -187,7 +188,7 @@ function loadCategory(name) {
 // ===============================
 function showCategory(name) {
   document.querySelectorAll(".category").forEach(c => c.style.display = "none");
-  document.getElementById(name).style.display = "flex";
+  document.getElementById(name).style.display = "block";
 }
 window.showCategory = showCategory;
 
