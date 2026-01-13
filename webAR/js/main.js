@@ -5,14 +5,11 @@ import { initCamera } from './camera.js';
 import { fireworks, initFireworks } from './fireworks.js';
 import { launchMainFireworks, launchBackgroundFireworks } from './launcher.js';
 
-// Audio
 await audioReady;
 initAudio();
 
-// Camera
 initCamera();
 
-// Three.js setup
 const scene = new THREE.Scene();
 scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 
@@ -44,14 +41,11 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Fireworks
 initFireworks(scene);
 
-// Launchers
 launchMainFireworks();
 launchBackgroundFireworks();
 
-// Render loop
 function animate() {
   requestAnimationFrame(animate);
 
