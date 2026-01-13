@@ -1,0 +1,143 @@
+/* ------------------------------
+   🌸 全体の背景（ピンクグラデ）
+------------------------------ */
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #ffe6f2, #ffd1e8);
+  font-family: 'Zen Maru Gothic', sans-serif;
+}
+
+/* ------------------------------
+   🌸 中央コンテナ
+------------------------------ */
+.container {
+  text-align: center;
+  padding: 40px 30px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(255, 150, 200, 0.4);
+  backdrop-filter: blur(6px);
+  width: 420px;
+  max-width: 90%;
+}
+
+/* ------------------------------
+   🌸 タイトル
+------------------------------ */
+h1 {
+  font-size: 28px;
+  color: #ff66aa;
+  margin-bottom: 30px;
+  text-shadow: 0 0 8px rgba(255, 150, 200, 0.5);
+}
+
+/* ------------------------------
+   🌸 ボタン配置
+------------------------------ */
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ------------------------------
+   🌸 ボタン本体
+------------------------------ */
+.btn {
+  display: block;
+  padding: 15px 25px;
+  background: #ff99cc;
+  color: white;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(255, 100, 150, 0.4);
+  transition: 0.25s;
+}
+
+/* ホバー時のふわっと光る演出 */
+.btn:hover {
+  background: #ff66b3;
+  box-shadow: 0 0 15px rgba(255, 120, 180, 0.7);
+  transform: translateY(-3px);
+}
+
+/* ------------------------------
+   🌸 クリック時のアニメーション
+------------------------------ */
+.btn.clicked {
+  transform: scale(0.92);
+  box-shadow: 0 0 12px rgba(255, 120, 180, 0.6);
+}
+
+/* ------------------------------
+   📱 スマホ（縦画面）
+------------------------------ */
+@media screen and (max-width: 600px) and (orientation: portrait) {
+  body {
+    align-items: flex-start;
+    padding-top: 15vh;
+  }
+
+  .container {
+    width: 88%;
+    padding: 30px 20px;
+  }
+
+  h1 {
+    font-size: 22px;
+    margin-bottom: 25px;
+  }
+
+  .btn {
+    font-size: 18px;
+    padding: 14px 20px;
+  }
+}
+
+/* ------------------------------
+   📱 スマホ（横画面）
+------------------------------ */
+@media screen and (max-width: 800px) and (orientation: landscape) {
+  body {
+    padding-top: 5vh;
+  }
+
+  .container {
+    width: 70%;
+    padding: 25px 20px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  .btn {
+    font-size: 16px;
+    padding: 12px 18px;
+  }
+}
+
+/* ------------------------------
+   💻 PC
+------------------------------ */
+@media screen and (min-width: 1024px) {
+  .container {
+    width: 450px;
+  }
+
+  h1 {
+    font-size: 30px;
+  }
+
+  .btn {
+    font-size: 22px;
+    padding: 18px 28px;
+  }
+}
