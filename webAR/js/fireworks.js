@@ -20,6 +20,7 @@ export class FireworkBall {
     this.age = 0;
     this.lifespan = 50;
 
+    // 本体
     this.geometry = new THREE.BufferGeometry();
     this.geometry.setAttribute(
       'position',
@@ -47,8 +48,34 @@ export class FireworkBall {
       0
     );
 
-    this.trailPositions = [];
+    // ★ 軽量化：trail を固定数の Points で使い回す
     this.maxTrail = 12;
+    this.trail = [];
+
+    for (let i = 0; i < this.maxTrail; i++) {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute(
+        'position',
+        new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3)
+      );
+
+      const mat = new THREE.PointsMaterial({
+        map: glowTexture,
+        color: 0xffffff,
+        size: 0.06,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+
+      const p = new THREE.Points(geo, mat);
+      p.visible = false;
+      scene.add(p);
+
+      this.trail.push({ p, geo, mat });
+    }
   }
 
   update() {
@@ -56,36 +83,21 @@ export class FireworkBall {
     this.points.position.add(this.velocity);
     this.velocity.y -= 0.002;
 
-    this.trailPositions.push(this.points.position.clone());
-    if (this.trailPositions.length > this.maxTrail) this.trailPositions.shift();
+    // ★ 軌跡の更新（new しない）
+    for (let i = this.maxTrail - 1; i > 0; i--) {
+      const prev = this.trail[i - 1].p.position;
+      this.trail[i].p.position.copy(prev);
+    }
 
-    for (let i = 0; i < this.trailPositions.length; i++) {
-      const pos = this.trailPositions[i];
-      const alpha = 1 - i / this.trailPositions.length;
+    // 先頭に現在位置
+    this.trail[0].p.position.copy(this.points.position);
 
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3));
-
-      const mat = new THREE.PointsMaterial({
-        map: glowTexture,
-        color: 0xffffff,
-        size: 0.06,
-        transparent: true,
-        opacity: alpha * 0.8,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        sizeAttenuation: true
-      });
-
-      const p = new THREE.Points(geo, mat);
-      p.position.copy(pos);
-      scene.add(p);
-
-      setTimeout(() => {
-        scene.remove(p);
-        geo.dispose();
-        mat.dispose();
-      }, 160);
+    // opacity を古いほど薄く
+    for (let i = 0; i < this.maxTrail; i++) {
+      const t = 1 - i / this.maxTrail;
+      const item = this.trail[i];
+      item.mat.opacity = t * 0.8;
+      item.p.visible = true;
     }
 
     // 寿命で爆発
@@ -95,12 +107,20 @@ export class FireworkBall {
       this.geometry.dispose();
       this.material.dispose();
 
-      // 🔥 分割前と同じ：即時再生
+      // trail の後処理
+      for (const item of this.trail) {
+        scene.remove(item.p);
+        item.geo.dispose();
+        item.mat.dispose();
+      }
+
       playSound(fireworkBuffer2);
     }
   }
 
-  isDead() { return this.age >= this.lifespan; }
+  isDead() {
+    return this.age >= this.lifespan;
+  }
 }
 
 // ---------------- Explosion ----------------
