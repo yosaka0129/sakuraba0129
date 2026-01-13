@@ -377,7 +377,7 @@ document.getElementById("saveBtn").onclick = () => {
 };
 
 // ===============================
-// 初期化
+// 初期化（★ お祝いカテゴリ追加済み）
 // ===============================
-["frames", "stamps", "phrases"].forEach(loadCategory);
+["frames", "celebration", "stamps", "phrases"].forEach(loadCategory);
 showCategory("frames");
