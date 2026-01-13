@@ -30,9 +30,9 @@ html, body {
   margin: 0;
 }
 
-/* キャンバス領域（残り全部を使う） */
+/* キャンバス領域（画面の割合で調整） */
 #canvasArea {
-  flex: 1;
+  height: 62vh; /* ← 画面の62%をキャンバスにする（万能値） */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -102,6 +102,7 @@ html, body {
   padding: 4px 0;
 }
 
+/* 素材一覧（高さは固定、キャンバスと独立） */
 .category {
   display: none;
   flex-direction: row;

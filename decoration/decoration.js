@@ -4,6 +4,16 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+// ===============================
+// 写真読み込み（← photo を先に定義するのが重要）
+// ===============================
+let photo = new Image();
+photo.src = sessionStorage.getItem("croppedPhoto");
+photo.onload = () => draw();
+
+// ===============================
+// Canvas リサイズ
+// ===============================
 function resizeCanvas() {
   const area = document.getElementById("canvasArea");
   canvas.width = area.clientWidth;
@@ -13,13 +23,6 @@ function resizeCanvas() {
 
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
-
-// ===============================
-// 写真読み込み
-// ===============================
-let photo = new Image();
-photo.src = sessionStorage.getItem("croppedPhoto");
-photo.onload = () => draw();
 
 // ===============================
 // 素材管理
