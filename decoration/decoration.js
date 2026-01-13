@@ -1,11 +1,18 @@
 // ===============================
-// Canvas 初期設定
+// Canvas 初期設定（画面にフィット）
 // ===============================
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth * 0.9;
-canvas.height = window.innerHeight * 0.6;
+function resizeCanvas() {
+  const area = document.getElementById("canvasArea");
+  canvas.width = area.clientWidth;
+  canvas.height = area.clientHeight;
+  draw();
+}
+
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
 // ===============================
 // 写真読み込み
@@ -17,9 +24,9 @@ photo.onload = () => draw();
 // ===============================
 // 素材管理
 // ===============================
-let placed = [];      // スタンプ・フレーズ
-let selected = null;  // 選択中の素材
-let currentFrame = null; // フレームは1つだけ
+let placed = [];
+let selected = null;
+let currentFrame = null;
 
 // ===============================
 // Undo 用
@@ -129,14 +136,7 @@ function setFrame(src) {
 function placeStamp(imageObj) {
   saveHistory();
 
-  let initialScale = 1;
-
-  // フレームはぴったり
-  if (imageObj.src.includes("frames")) {
-    initialScale = Math.min(canvas.width / imageObj.width, canvas.height / imageObj.height);
-  } else {
-    initialScale = 0.35; // スタンプは小さめ
-  }
+  let initialScale = 0.35;
 
   const obj = {
     img: imageObj,
@@ -169,15 +169,11 @@ function loadCategory(name) {
       files.forEach(file => {
         const img = document.createElement("img");
         img.src = `assets/${name}/${file}`;
-        img.style.objectFit = "contain";
-        img.style.margin = "4px";
-
         img.onclick = () => {
           const imageObj = new Image();
           imageObj.src = img.src;
           imageObj.onload = () => placeStamp(imageObj);
         };
-
         box.appendChild(img);
       });
     });
@@ -188,7 +184,7 @@ function loadCategory(name) {
 // ===============================
 function showCategory(name) {
   document.querySelectorAll(".category").forEach(c => c.style.display = "none");
-  document.getElementById(name).style.display = "block";
+  document.getElementById(name).style.display = "flex";
 }
 window.showCategory = showCategory;
 
@@ -377,7 +373,7 @@ document.getElementById("saveBtn").onclick = () => {
 };
 
 // ===============================
-// 初期化（★ お祝いカテゴリ追加済み）
+// 初期化
 // ===============================
-["frames", "celebration", "stamps", "phrases"].forEach(loadCategory);
+["frames", "stamps", "phrases"].forEach(loadCategory);
 showCategory("frames");

@@ -1,54 +1,66 @@
-/* 全体レイアウト */
-body {
+/* 全体レイアウト（デバイスにぴったり） */
+html, body {
   margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden; /* スクロール禁止 */
   font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
   background: #fff7fb;
   color: #444;
 }
 
+/* アプリ全体を縦に並べる */
 #app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   max-width: 900px;
   margin: auto;
-  padding: 10px;
 }
 
 /* タイトル */
 #header {
   text-align: center;
-  padding: 10px 0;
+  padding: 8px 0;
 }
 
 #header h2 {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   color: #ff6fa8;
   margin: 0;
 }
 
-/* キャンバスエリア */
+/* キャンバス領域（残り全部を使う） */
 #canvasArea {
-  text-align: center;
-  margin-top: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
+/* キャンバスは領域いっぱいにフィット */
 #canvas {
-  width: 90%;
-  max-width: 800px;
+  width: 100%;
+  height: 100%;
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2);
+  object-fit: contain;
 }
 
-/* アクションボタン（選択変更・消去・保存） */
+/* アクションボタン */
 #actionButtons {
-  margin-top: 12px;
+  margin-top: 6px;
   display: flex;
   justify-content: center;
   gap: 12px;
 }
 
 #actionButtons button {
-  padding: 12px 20px;
-  font-size: 1rem;
+  padding: 10px 18px;
+  font-size: 0.9rem;
   border: none;
   border-radius: 25px;
   background: #ffb6d9;
@@ -63,21 +75,17 @@ body {
   transform: translateY(-2px);
 }
 
-#actionButtons button:active {
-  transform: translateY(1px);
-}
-
 /* タブボタン */
 #tabs {
-  margin-top: 20px;
   display: flex;
   justify-content: center;
   gap: 10px;
+  padding: 6px 0;
 }
 
 #tabs button {
-  padding: 10px 18px;
-  font-size: 1rem;
+  padding: 8px 14px;
+  font-size: 0.9rem;
   border: none;
   border-radius: 20px;
   background: #ffd7ec;
@@ -89,30 +97,33 @@ body {
   background: #ffb6d9;
 }
 
-/* 素材一覧 */
+/* 素材一覧（横スクロール） */
 #categories {
-  margin-top: 15px;
+  padding: 4px 0;
 }
 
 .category {
   display: none;
+  flex-direction: row;
+  overflow-x: auto;
+  white-space: nowrap;
+  gap: 10px;
   padding: 10px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(255, 105, 180, 0.15);
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 10px;
+  height: 130px;
 }
 
 .category img {
-  width: 100%;
-  height: 90px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
   background: #fff0f7;
   border-radius: 10px;
   padding: 6px;
   cursor: pointer;
+  flex-shrink: 0;
   transition: 0.2s;
 }
 
