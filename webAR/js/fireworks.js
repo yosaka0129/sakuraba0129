@@ -221,6 +221,7 @@ export class Explosion {
 }
 
 // ---------------- ShapeExplosion（ハート・さくら） ----------------
+// ---------------- ShapeExplosion（ハート・さくら） ----------------
 export class ShapeExplosion {
   constructor(position, type = "heart") {
     this.type = type;
@@ -240,10 +241,12 @@ export class ShapeExplosion {
       if (type === "heart") {
         const t = Math.random() * 2 * Math.PI;
 
-        // ★ 変更：ハートの形を大きく
-        x = 14 * Math.pow(Math.sin(t), 3);
-        y = 11 * Math.cos(t) - 4 * Math.cos(2*t)
-            - 1.6 * Math.cos(3*t) - 0.8 * Math.cos(4*t);
+        // ★ ハートを少し小さく（全体を 0.8 倍）
+        x = 11.2 * Math.pow(Math.sin(t), 3);
+        y = 8.8 * Math.cos(t)
+            - 3.2 * Math.cos(2*t)
+            - 1.28 * Math.cos(3*t)
+            - 0.64 * Math.cos(4*t);
 
         rx = x * cosA - y * sinA;
         ry = x * sinA + y * cosA;
@@ -253,8 +256,8 @@ export class ShapeExplosion {
         this.positions[i*3+1] = 0;
         this.positions[i*3+2] = 0;
 
-        // ★ 変更：広がりも大きく
-        this.velocities.push(new THREE.Vector3(rx * 0.025, ry * 0.025, vz));
+        // ★ 広がりも少し弱める（0.025 → 0.020）
+        this.velocities.push(new THREE.Vector3(rx * 0.020, ry * 0.020, vz));
 
       } else if (type === "sakura") {
         const spikes = 5;
